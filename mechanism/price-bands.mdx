@@ -1,0 +1,138 @@
+---
+title: "How Price Bands and Clamping Protect You on Trade[XYZ]"
+description: "Learn how Trade[XYZ] limits the maximum price move per update to protect your positions from sudden oracle dislocations and potential price manipulation."
+---
+
+Every price that Trade[XYZ] publishes — oracle, mark1, mark2, and external — is subject to a maximum allowed move per update tick. If the raw calculated price would jump beyond that limit relative to the previous published value, the platform caps it at the boundary instead. This cap is called a **clamp**. Understanding how clamping works helps you interpret unusual mark prices and predict how quickly the platform will converge on the true market price after a large move.
+
+## What a price band is
+
+Each price type has a configured `maxMove` parameter. The default is **0.005**, meaning any single price update can move at most **0.5%** up or down from the previous published price.
+
+If the newly computed price falls within ±0.5% of the previous price, it is published as-is. If it falls outside that band, the published price is instead set to the maximum allowed value — the boundary of the band — regardless of what the raw inputs say.
+
+<Note>
+  Clamping is applied independently to each price type. Oracle, mark1, mark2, and external can each be clamped separately on the same update cycle.
+</Note>
+
+## Why clamping protects you
+
+Without price bands, a manipulated oracle feed or a sudden data error could cause your mark price to jump by 5% or 10% in a single tick — potentially triggering liquidations on positions that are actually healthy. Clamping ensures that even if an external feed sends a wildly incorrect value, the published price only moves by a small, bounded amount. Your position has time to be evaluated against a price that converges gradually toward the new level.
+
+<AccordionGroup>
+  <Accordion title="Protection against oracle manipulation">
+    If a price provider briefly sends a corrupted or manipulated price, the clamped value deviates from the true market price by at most `maxMove` per tick. An attacker would need to sustain the manipulation across many consecutive updates to move your mark price significantly — making attacks much more costly and less effective.
+  </Accordion>
+  <Accordion title="Protection against sudden gaps">
+    When a stock or index gaps sharply at open (for example after earnings), the mark price converges toward the new level gradually rather than jumping all at once. This gives you a brief window to assess your position before the full move is reflected in your P&L.
+  </Accordion>
+  <Accordion title="Fair liquidation prices">
+    Both mark1 and mark2 are clamped independently. The two-variant system combined with clamping means that a brief, sharp spike in raw prices is unlikely to trigger a liquidation at an unfair level — the slower mark2 provides a secondary check even while mark1 is converging.
+  </Accordion>
+</AccordionGroup>
+
+## How clamping works step by step
+
+<Steps>
+  <Step title="New price is computed">
+    Trade[XYZ] calculates the raw price for each type using the current provider feeds, oracle data, and order book inputs. See [Price Derivation](/mechanism/pricing) for the full calculation logic.
+  </Step>
+  <Step title="Band check">
+    The system compares the new raw price against the previous published price:
+
+    ```
+    clampTo = previousPrice × (1 ± maxMove)
+    ```
+
+    If the new price is within `[previousPrice × 0.995, previousPrice × 1.005]`, no clamping occurs.
+  </Step>
+  <Step title="Clamp applied if needed">
+    If the new price is outside the band, the platform sets the published price to the boundary value:
+
+    - New price too high → published price = `previousPrice × 1.005`
+    - New price too low → published price = `previousPrice × 0.995`
+
+    The raw computed price is discarded for this tick.
+  </Step>
+  <Step title="Convergence over successive updates">
+    On each subsequent update, the platform repeats the check against the latest clamped price. Because the raw target price is still outside the band, clamping continues to apply — each tick moves the published price 0.5% closer to the true value.
+  </Step>
+</Steps>
+
+## A worked example
+
+Suppose TSLA's mark price is **461.6** and a new oracle input arrives suggesting the true price is **442.66** — a drop of roughly 4.1%. With `maxMove = 0.005`, the platform cannot publish a drop greater than 0.5% in one tick.
+
+Here is what happens across four consecutive updates:
+
+| Update | Previous mark | Raw target | Clamped price | Gap remaining |
+|--------|--------------|------------|---------------|---------------|
+| 1 | 461.600 | 442.66 | 459.308 | 16.648 |
+| 2 | 459.308 | 442.66 | 457.031 | 14.371 |
+| 3 | 457.031 | 442.66 | 454.766 | 12.106 |
+| 4 | 454.766 | 442.66 | 452.512 | 9.852 |
+
+Each tick closes roughly 2.3 points of the gap. A ~4% move fully converges in approximately 8–9 update cycles.
+
+This is exactly what was observed in live data from October 2025:
+
+```text
+Price moved too far, new price is clamped
+  asset=910001 kind=Mark
+  previous_price=461.462  new_price=442.66  clamped_price=456.847  daily_price=461.6
+
+Price moved too far, new price is clamped
+  asset=910001 kind=Mark
+  previous_price=456.847  new_price=442.66  clamped_price=452.279  daily_price=461.6
+
+Price moved too far, new price is clamped
+  asset=910001 kind=Mark
+  previous_price=452.279  new_price=442.66  clamped_price=447.756  daily_price=461.6
+
+Price moved too far, new price is clamped
+  asset=910001 kind=Mark
+  previous_price=447.756  new_price=442.66  clamped_price=443.278  daily_price=461.6
+```
+
+Notice that on the fourth update the clamped price (443.278) has nearly converged on the target (442.66). The next update will publish the true price without clamping.
+
+<Tip>
+  The `daily_price` field in clamp logs is the price at the start of the trading day, not the previous tick price. It is used for daily P&L accounting, not for the clamp calculation itself.
+</Tip>
+
+## Mark1 vs mark2 during clamping
+
+Mark1 and mark2 are clamped separately against their own previous values. Because mark2 incorporates the order book EMA and may already be tracking the true price more closely, you can see situations where mark1 and mark2 diverge significantly during a clamping episode.
+
+From a real broadcast during the same TSLA event:
+
+```json
+{
+  "asset": "TSLA",
+  "oraclePx":      "453.99",
+  "externalPerpPx": "430.4",
+  "mark1Px":        "451.72",
+  "mark2Px":        "415.56"
+}
+```
+
+Here mark2 (415.56) is already much closer to the external price (430.4), while mark1 (451.72) is still converging from the prior day's level. This divergence is normal during a large downward move — mark2 is faster because it incorporates the order book EMA which responds more quickly to changes in available liquidity.
+
+<Warning>
+  During a clamping episode, the price you see in the UI reflects the clamped value, not the raw market price. If you are monitoring your liquidation threshold, be aware that the effective mark price may be temporarily above or below the current external market price.
+</Warning>
+
+## What you see in the platform
+
+When clamping is active, the platform emits warnings you may observe in system feeds or status interfaces. The key fields in a clamp warning are:
+
+| Field | Meaning |
+|-------|---------|
+| `asset` | Asset identifier |
+| `kind` | Which price type was clamped (`Mark`, `Oracle`, `External`) |
+| `previous_price` | The price published on the prior tick |
+| `new_price` | The raw computed price that triggered clamping |
+| `clamped_price` | The actual published price (boundary of the band) |
+| `daily_price` | The price at the start of the current trading day |
+
+No action is required when you see clamping activity. The price will converge to the true market level over successive update cycles.

@@ -1,0 +1,105 @@
+---
+title: "Margin Modes on Trade[XYZ]: Cross and Isolated"
+description: "Understand how margin works on Trade[XYZ], the difference between cross-margin and isolated-margin, and how to choose the right mode for your strategy."
+---
+
+Margin is the collateral you put up to open a leveraged position. Instead of paying the full notional value of a trade, you deposit a fraction — your margin — and the platform extends the rest. This amplifies both your potential gains and your potential losses relative to your collateral. Understanding how margin works, and which mode to use, is one of the most important decisions you make as a leveraged trader.
+
+## What is leverage?
+
+Leverage is the ratio of your position size to your collateral. A 10× leveraged position means you control \$10,000 worth of exposure with \$1,000 of margin.
+
+| Leverage | Position size | Margin required | 1% adverse move costs |
+|---|---|---|---|
+| 2× | \$10,000 | \$5,000 | \$100 (2% of margin) |
+| 5× | \$10,000 | \$2,000 | \$100 (5% of margin) |
+| 10× | \$10,000 | \$1,000 | \$100 (10% of margin) |
+| 20× | \$10,000 | \$500 | \$100 (20% of margin) |
+
+<Warning>
+  Higher leverage means your liquidation price is closer to your entry price. A small adverse move can wipe out your margin entirely.
+</Warning>
+
+## Initial margin vs maintenance margin
+
+Two margin thresholds govern every position:
+
+- **Initial margin** — the amount required to open a position. This is determined by the leverage you select.
+- **Maintenance margin** — the minimum amount required to keep the position open. If your margin falls to or below this level, your position is liquidated.
+
+<Note>
+  The gap between your current margin and the maintenance margin is your buffer against adverse price moves. The higher your leverage, the smaller this buffer.
+</Note>
+
+## Margin modes
+
+Trade[XYZ] supports two margin modes: cross-margin and isolated-margin. You choose the mode before opening a position.
+
+<Tabs>
+  <Tab title="Cross-margin">
+    In cross-margin mode, all of your open positions share a single collateral pool. The full balance of your account is available to support any individual position.
+
+    **How it works:**
+    - A profitable position can offset the margin requirement of a losing one.
+    - If one position is losing, the account's available balance absorbs the drawdown rather than triggering an immediate liquidation.
+    - Liquidation is triggered only when your total account equity falls below the maintenance margin of your entire portfolio.
+
+    **Best for:**
+    - Traders running multiple correlated positions who want capital efficiency.
+    - Hedging strategies where one leg offsets the other.
+
+    <Warning>
+      A large, unexpected loss in one market draws from the same pool as all your other positions. In an extreme scenario, one bad trade can liquidate your entire account.
+    </Warning>
+  </Tab>
+  <Tab title="Isolated-margin">
+    In isolated-margin mode, each position has its own dedicated collateral. Only the margin allocated to that specific position is at risk.
+
+    **How it works:**
+    - You assign a fixed amount of margin to a position when you open it.
+    - The maximum you can lose on that position is the margin you allocated.
+    - If the position is liquidated, your other positions and account balance are unaffected.
+
+    **Best for:**
+    - Directional trades where you want to define and cap your maximum risk upfront.
+    - Newer traders who want clear, predictable risk per trade.
+
+    <Tip>
+      You can add margin to an isolated position at any time to reduce the risk of liquidation without changing your other positions.
+    </Tip>
+  </Tab>
+</Tabs>
+
+## Comparison at a glance
+
+| | Cross-margin | Isolated-margin |
+|---|---|---|
+| Collateral pool | Shared across all positions | Separate per position |
+| Capital efficiency | Higher | Lower |
+| Maximum loss per trade | Entire account balance | Allocated margin only |
+| Risk containment | Lower | Higher |
+| Best use case | Hedges, multi-leg strategies | Single directional trades |
+
+## Portfolio margin
+
+<Info>
+  Portfolio margin is not currently available on Trade[XYZ].
+</Info>
+
+## Choosing the right mode
+
+<AccordionGroup>
+  <Accordion title="When to use cross-margin" icon="arrows-left-right">
+    Use cross-margin when you are running a portfolio of positions and want your gains in one market to support your losses in another. It is well-suited to pairs trades, hedged positions, or situations where you want to maximise the capital you have working in the market at any given time.
+  </Accordion>
+  <Accordion title="When to use isolated-margin" icon="lock">
+    Use isolated-margin when you are making a single directional bet and want to know exactly how much you can lose before you place the trade. It prevents a surprise move from cascading across your account.
+  </Accordion>
+  <Accordion title="Can I switch modes on an open position?" icon="arrows-rotate">
+    You cannot switch margin modes on an open position. Close the position first, then reopen it in the desired mode. Plan your margin mode before entering a trade.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  If you are uncertain, isolated-margin is the more conservative default. It caps your downside clearly and keeps the rest of your account protected while you learn how a market behaves.
+</Tip>

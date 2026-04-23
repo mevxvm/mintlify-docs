@@ -1,0 +1,108 @@
+---
+title: 'Global Stock Perpetuals: Korea & Japan on Trade[XYZ]'
+description: 'Reference for Korean and Japanese equity perpetuals on Trade[XYZ]: KRW/JPY composite USD pricing, trading venues, session hours, and per-asset details.'
+---
+
+Trade[XYZ] lists perpetual futures on select equities from Korea and Japan. Unlike US-listed stocks, these are **composite** contracts: the oracle converts the underlying stock's local-currency price to USD at the prevailing spot FX rate. You trade in USD with no need to hold or manage foreign currency directly.
+
+<Note>
+Chinese stocks listed on SSE, SZSE, and HKEX have limited oracle coverage of approximately 4 hours during daytime hours only. Check the current market status page for live availability before trading Chinese equities.
+</Note>
+
+<Tabs>
+  <Tab title="Korea">
+
+## Korean equity perpetuals
+
+All Korean equity perpetuals are KRW → USD composite listings. The oracle converts the underlying stock's Korean won price to US dollars at the prevailing USD/KRW spot rate in real time.
+
+### Trading venues
+
+| Venue | Type | Session (KST) |
+|-------|------|--------------|
+| KRX / KOSPI | Primary exchange | 09:00 – 15:30 |
+| Nextrade (NXT) | ATS (alternative trading system) | 08:00 – 20:00 |
+
+Nextrade extends coverage significantly beyond the primary KRX session — from 08:00 to 20:00 KST — giving you roughly 12 hours of liquidity per weekday.
+
+### Korean equity listing
+
+<Tabs>
+  <Tab title="SMSN — Samsung">
+
+**Coin**: `xyz:SMSN`
+
+SAMSUNG (SMSN) tracks the value of 1 share of common stock in Samsung Electronics Co., Ltd. The oracle converts the underlying Korean stock's KRW price to USD at the prevailing USD/KRW FX rate.
+
+Samsung Electronics is a global leader in semiconductors, consumer electronics, and display technology. The company manufactures memory chips (DRAM, NAND), logic semiconductors, smartphones (Galaxy series), televisions, and OLED display panels. It is one of the world's largest technology companies by revenue.
+
+  </Tab>
+  <Tab title="SKHX — SK Hynix">
+
+**Coin**: `xyz:SKHX`
+
+SKHYNIX (SKHX) tracks the value of 1 share of common stock in SK hynix Inc. The oracle converts the underlying Korean stock's KRW price to USD at the prevailing USD/KRW FX rate.
+
+SK Hynix manufactures DRAM and NAND memory semiconductors used in data centers, AI hardware, mobile devices, and computing systems. The company is a major supplier to hyperscalers and AI chip makers, making it a direct beneficiary of growth in AI infrastructure spending.
+
+  </Tab>
+  <Tab title="HYUNDAI — Hyundai Motor">
+
+**Coin**: `xyz:HYUNDAI`
+
+HYUNDAI tracks the value of 1 share of common stock in Hyundai Motor Company. The oracle converts the underlying Korean stock's KRW price to USD at the prevailing USD/KRW FX rate.
+
+Hyundai is a global automobile manufacturer with a broad lineup of conventional and electric vehicles. Hyundai Motor Group holds an 80% stake in Boston Dynamics, the robotics firm known for its advanced bipedal and quadruped robots.
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+  <Tab title="Japan">
+
+## Japanese equity perpetuals
+
+All Japanese equity perpetuals are JPY → USD composite listings. The oracle converts the underlying stock's yen price to US dollars at the prevailing USD/JPY spot rate in real time.
+
+### Trading venues
+
+| Venue | Type | Session (JST) |
+|-------|------|--------------|
+| TSE (Tokyo Stock Exchange) | Primary exchange | 09:00 – 15:30 |
+| Japanext PTS | Night-session ATS | 16:30 – 23:59 |
+
+Japanext's night session runs from 16:30 to 23:59 JST, bridging into early US trading hours and substantially extending your access to Japanese equity pricing.
+
+### Japanese equity listing
+
+<Tabs>
+  <Tab title="SOFTBANK — SoftBank Group">
+
+**Coin**: `xyz:SOFTBANK`
+
+SOFTBANK tracks the value of 1 share of common stock in SoftBank Group Corp. The oracle converts the underlying Japanese stock's JPY price to USD at the prevailing USD/JPY FX rate.
+
+SoftBank is a Japanese investment holding company with major positions in technology companies globally. Its Vision Funds have invested in a broad portfolio of technology, telecommunications, and high-growth startups. SoftBank also owns a controlling stake in Arm Holdings, the dominant processor architecture licensor for mobile and embedded computing.
+
+  </Tab>
+  <Tab title="KIOXIA — Kioxia Holdings">
+
+**Coin**: `xyz:KIOXIA`
+
+KIOXIA tracks the value of 1 share of common stock in Kioxia Holdings Corporation. The oracle converts the underlying Japanese stock's JPY price to USD at the prevailing USD/JPY FX rate.
+
+Kioxia is a leading manufacturer of NAND flash memory and solid-state storage solutions used in data centers, smartphones, and computing systems. The company is a key supplier in the global NAND market alongside Samsung, SK Hynix, Micron, and Western Digital.
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+</Tabs>
+
+## Oracle and FX conversion
+
+For all international equity perpetuals, the oracle price you see in Trade[XYZ] is always denominated in USD. The conversion uses the prevailing spot USD/KRW or USD/JPY rate at the time of each oracle update. You are implicitly exposed to FX movements in addition to the underlying equity price — a falling KRW or JPY will reduce the USD value of Korean or Japanese positions even if the local share price is unchanged.
+
+<Tip>
+If you want pure Korean or Japanese equity exposure without FX risk, consider pairing an international equity perpetual with a position in the corresponding FX perpetual (e.g., `xyz:JPY` for yen exposure).
+</Tip>

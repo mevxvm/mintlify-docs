@@ -1,0 +1,119 @@
+---
+title: 'Precious Metal Perpetuals on Trade[XYZ]: Full Reference'
+description: 'Gold, silver, platinum, and palladium perpetuals on Trade[XYZ] — spot-based oracles, underlying futures, and contract identifiers for each metal.'
+---
+
+Trade[XYZ] lists four precious metal perpetuals: Gold, Silver, Platinum, and Palladium. Unlike energy and base metal contracts, precious metals use **spot-based oracles** rather than futures-based price feeds. Prices are derived from OTC dealer composite quotes aggregated across multiple providers — there are no roll mechanics to manage, and positions can be held indefinitely.
+
+## Contracts at a glance
+
+| Symbol | Display | Spot pair | Underlying futures | Oracle type |
+|--------|---------|-----------|-------------------|-------------|
+| **GOLD** | GOLD | XAU/USD | COMEX GC | Spot-based |
+| **SILVER** | SILVER | XAG/USD | COMEX SI | Spot-based |
+| **PLATINUM** | PLATINUM | XPT/USD | NYMEX PL | Spot-based |
+| **PALLADIUM** | PALLADIUM | XPD/USD | NYMEX PA | Spot-based |
+
+<Info>
+  All four metals are priced per troy ounce. The coin identifier format is `xyz:SYMBOL` — for example, `xyz:GOLD` for gold and `xyz:SILVER` for silver.
+</Info>
+
+---
+
+## Gold (GOLD)
+
+Gold is one of the most widely held financial assets in the world. It functions as an inflation hedge, a store of value, and a central bank reserve asset. Unlike other commodities, gold's demand is driven more by financial and portfolio considerations than by industrial use — though it does see industrial demand in electronics and dentistry.
+
+The global benchmark is the **LBMA Gold Price**, set twice daily at 10:30 and 15:00 London time by ICE Benchmark Administration (IBA). Approximately $24 billion in gold is cleared through the LBMA each day.
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Coin** | `xyz:GOLD` |
+| **Display name** | GOLD |
+| **Keywords** | `xau`, `metal` |
+| **Spot symbol** | XAU/USD |
+| **Underlying futures** | COMEX GC (100 troy oz per contract) |
+| **Oracle type** | Spot-based |
+| **Price source** | OTC dealer composite (Refinitiv / Pyth) |
+
+<Tip>
+  Gold's price tracks the OTC spot market — not a single exchange feed. The oracle aggregates quotes from multiple dealers to produce a composite mid-price.
+</Tip>
+
+---
+
+## Silver (SILVER)
+
+Silver is both a precious and an industrial metal. On the investment side, it functions similarly to gold as a store of value and inflation hedge — though with higher price volatility. On the industrial side, silver has extensive demand in electronics (due to its conductivity), solar panels, and jewelry. This dual demand profile makes silver sensitive to both risk-off investor flows and global manufacturing conditions.
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Coin** | `xyz:SILVER` |
+| **Display name** | SILVER |
+| **Keywords** | `xag`, `metal` |
+| **Spot symbol** | XAG/USD |
+| **Underlying futures** | COMEX SI |
+| **Oracle type** | Spot-based |
+
+---
+
+## Platinum (PLATINUM)
+
+Platinum is a dense, corrosion-resistant precious metal. Its primary demand comes from automotive catalysts (used in catalytic converters for gasoline and diesel vehicles), jewelry, and industrial applications. Platinum is rarer than gold and is mined predominantly in South Africa and Russia, making supply highly concentrated geographically.
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Coin** | `xyz:PLATINUM` |
+| **Display name** | PLATINUM |
+| **Keywords** | `XPT`, `metal` |
+| **Spot symbol** | XPT/USD |
+| **Underlying futures** | NYMEX PL |
+| **Oracle type** | Spot-based |
+
+---
+
+## Palladium (PALLADIUM)
+
+Palladium is primarily used in automotive catalytic converters for gasoline-engine vehicles, where it is the preferred metal for emissions control. Like platinum, it is sourced predominantly from South Africa and Russia, giving it a concentrated supply profile susceptible to geopolitical and logistical disruptions.
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Coin** | `xyz:PALLADIUM` |
+| **Display name** | PALLADIUM |
+| **Keywords** | `XPD`, `metal` |
+| **Spot symbol** | XPD/USD |
+| **Underlying futures** | NYMEX PA |
+| **Oracle type** | Spot-based |
+
+---
+
+## Oracle methodology
+
+All precious metal perpetuals on Trade[XYZ] use spot-based oracles. This is different from energy and base metal contracts, which reference specific underlying futures contracts.
+
+<AccordionGroup>
+  <Accordion title="Why spot-based oracles for precious metals?">
+    Precious metals have deep, liquid OTC spot markets that operate nearly 24 hours a day. The OTC market — not any single exchange — is the primary venue for price discovery, clearing, and settlement for institutional gold and silver transactions. Using a spot-based composite better reflects the true prevailing market price than anchoring to a single futures contract.
+  </Accordion>
+  <Accordion title="Price sources">
+    Spot prices are derived from OTC dealer composite quotes aggregated from multiple data providers, including Refinitiv and Pyth. This multi-source approach reduces reliance on any single feed and provides greater resilience against data gaps or stale quotes.
+  </Accordion>
+  <Accordion title="No roll mechanics">
+    Because precious metal perpetuals reference spot prices rather than rolling futures contracts, there are no roll events, no basis adjustments, and no expiration timestamps to track. You can hold a position indefinitely without the price being affected by a roll.
+  </Accordion>
+  <Accordion title="LBMA benchmark (gold)">
+    The LBMA Gold Price — set at 10:30 and 15:00 London time by ICE Benchmark Administration — is the most widely referenced daily benchmark for gold. It is distinct from the continuous spot oracle used by Trade[XYZ], which updates in real time throughout the trading day.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  Precious metals do not appear in the roll calendar. If you are referencing the [Roll Calendar](/asset-directory/roll-calendar), you will only see energy and base metal contracts there.
+</Note>

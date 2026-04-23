@@ -1,0 +1,93 @@
+---
+title: "How Perpetual Futures Work on Trade[XYZ]"
+description: "Learn how perpetual futures work on Trade[XYZ] — from funding rates and price types to position mechanics — so you can trade confidently."
+---
+
+Perpetual futures let you speculate on the price of an asset — stocks, indices, commodities, or FX — without owning it and without an expiry date. Unlike traditional futures contracts that settle on a fixed date, a perpetual future can be held indefinitely. Trade[XYZ] is built around this instrument, giving you 24/7 access to markets that are otherwise closed on weekends, overnight, or across time zones.
+
+## What is a perpetual future?
+
+A perpetual future is a derivatives contract that tracks the price of an underlying asset. You agree to buy or sell the asset at the current price, but settlement never comes — you simply hold your position until you choose to close it.
+
+<Info>
+  Trade[XYZ] offers perpetuals on equities (US, KR, JP, CH), equity indices, commodities, and FX pairs. There is no expiry date on any contract.
+</Info>
+
+### Long and short positions
+
+<Tabs>
+  <Tab title="Long">
+    You profit when the price of the asset rises. If you open a long position on TSLA at \$200 and it moves to \$220, you gain on that \$20 move (multiplied by your position size and leverage).
+  </Tab>
+  <Tab title="Short">
+    You profit when the price of the asset falls. If you open a short on NVDA at \$900 and it drops to \$850, you gain on that \$50 move. Losses are theoretically unlimited if the price rises against you.
+  </Tab>
+</Tabs>
+
+<Warning>
+  Both longs and shorts carry the risk of liquidation. Your position can be closed automatically if your margin falls below the maintenance level. See the [Liquidations](/trading/liquidations) page for details.
+</Warning>
+
+## How does price stay anchored to spot?
+
+Without an expiry date, nothing forces the perpetual price to converge with the spot price — so Trade[XYZ] uses a **funding rate** mechanism instead.
+
+The funding rate is a periodic payment exchanged between long and short position holders, calculated based on the difference between the perpetual price and the index price (the reference spot price).
+
+| Perpetual vs spot | Who pays whom | Market effect |
+|---|---|---|
+| Perpetual trades **above** spot | Longs pay shorts | Incentivises selling the perpetual, pushing price down |
+| Perpetual trades **below** spot | Shorts pay longs | Incentivises buying the perpetual, pushing price up |
+
+<Note>
+  Funding payments are continuous and are reflected in your unrealized P&L. You do not need to take any action — they are applied automatically.
+</Note>
+
+## Three price types
+
+Trade[XYZ] uses three distinct price feeds, each with a specific purpose.
+
+<AccordionGroup>
+  <Accordion title="Oracle price" icon="satellite-dish">
+    The oracle price is the fair-value reference for the underlying asset. It is derived from multiple independent external price providers and cross-validated against additional reference feeds, then used to calculate the funding rate. The oracle represents what the market believes the asset is actually worth.
+  </Accordion>
+  <Accordion title="Mark price" icon="tag">
+    The mark price is what determines your unrealized P&L and whether your position gets liquidated. Trade[XYZ] uses two mark price signals (mark1 and mark2) that incorporate smoothed price data. The mark price is deliberately more resistant to short-term spikes than the last traded price, which protects you from unfair liquidations caused by momentary wicks.
+  </Accordion>
+  <Accordion title="External price" icon="shield">
+    The external price is an additional safeguard that limits the ability of any actor to manipulate your unrealized P&L. It acts as a ceiling and floor on what the system will report as your P&L, even if the perpetual or oracle price moves temporarily outside a fair range.
+  </Accordion>
+</AccordionGroup>
+
+## Why perpetuals for equities?
+
+Traditional stock markets operate on fixed schedules — NYSE opens at 9:30 AM ET and closes at 4:00 PM ET, Monday to Friday. That means you cannot respond to earnings announcements released at 6:00 PM, geopolitical events over the weekend, or macroeconomic data published before the market opens.
+
+<Tip>
+  Trade[XYZ] perpetuals on equities like TSLA, NVDA, or the S&P 500 trade 24 hours a day, 7 days a week. You can act on information whenever it matters, not just when an exchange happens to be open.
+</Tip>
+
+This is the core idea behind Trade[XYZ]'s flagship product, the **Perpetual Equity Future** — a novel instrument introduced in 2025 that brings continuous, global access to equity markets.
+
+## Settlement and holding costs
+
+Perpetuals on Trade[XYZ] do not settle at expiry because there is no expiry. Instead, settlement happens continuously through funding:
+
+<Steps>
+  <Step title="Your position accrues funding">
+    At each funding interval, the system calculates the difference between the perpetual price and the oracle price and determines the funding rate.
+  </Step>
+  <Step title="Payment is exchanged">
+    If you are long and the perpetual trades above the oracle, you pay a small amount to the shorts. If the perpetual trades below the oracle, you receive a payment.
+  </Step>
+  <Step title="P&L is updated">
+    The funding payment is applied directly to your position's P&L. No cash moves between accounts manually.
+  </Step>
+  <Step title="You hold until you decide to close">
+    You can keep your position open indefinitely, as long as your margin remains above the maintenance level.
+  </Step>
+</Steps>
+
+<Note>
+  Assets that reference traditional futures contracts (such as commodities and equity indices) are subject to periodic **rolls**. See the [Roll Calendar](/asset-directory/roll-calendar) for all schedules.
+</Note>

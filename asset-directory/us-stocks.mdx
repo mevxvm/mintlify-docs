@@ -1,0 +1,83 @@
+---
+title: 'US Stock Perpetuals: NYSE & NASDAQ on Trade[XYZ]'
+description: 'Full reference for US equity perpetuals on Trade[XYZ]: session hours, ADS handling, and the complete NYSE/NASDAQ listing with coin identifiers for every asset.'
+---
+
+Trade[XYZ] offers perpetual futures on individual US equities listed on NYSE and NASDAQ. Each contract references a real-time spot price — there are no roll mechanics, expiration dates, or basis adjustments to manage. You simply go long or short, and the oracle tracks the live stock price continuously throughout covered trading hours.
+
+## Exchange coverage
+
+US equity perpetuals cover the full regular trading session (RTH) plus extended hours (pre-market and after-hours) on both NYSE and NASDAQ.
+
+| Session | Hours (ET) | Notes |
+|---------|-----------|-------|
+| Pre-market | 4:00 AM – 9:30 AM | Extended hours; liquidity varies |
+| Regular (RTH) | 9:30 AM – 4:00 PM | Full coverage, tightest spreads |
+| After-hours | 4:00 PM – 8:00 PM | Extended hours; liquidity varies |
+
+<Note>
+Extended hours oracle quality depends on the data providers active for each symbol. During RTH, multiple providers contribute high-quality feeds. During pre-market and after-hours, fewer market makers are active and bid-ask spreads are wider.
+</Note>
+
+## Extended-hours oracle coverage
+
+Trade[XYZ] aggregates price data from multiple independent providers to maintain oracle quality across all sessions. During regular trading hours (RTH), all providers contribute high-quality, tightly arbitraged feeds. During pre-market and after-hours, fewer market makers are active, which can widen effective spreads and reduce oracle precision.
+
+<Note>
+Extended-hours oracle quality varies by symbol. High-volume stocks like TSLA, NVDA, and AAPL maintain better extended-hours pricing than lower-volume names.
+</Note>
+
+## Foreign shares listed in the US
+
+Some assets in this list — BABA (Alibaba) and TSM (TSMC) — are American Depositary Shares (ADS) of foreign companies trading on US exchanges. Because they are US-listed and priced in USD, no FX conversion is applied. You trade them exactly like any other US equity perpetual.
+
+<Tip>
+ETFs like EWJ and EWY are US-listed funds that provide diversified exposure to Japanese and South Korean equities respectively. They trade on US exchanges in USD and require no FX conversion.
+</Tip>
+
+## US equity listing
+
+The table below covers all US equity perpetuals available on Trade[XYZ]. Each symbol has a corresponding `coin` identifier used in the API and order entry.
+
+| Symbol | Display Name | Description |
+|--------|-------------|-------------|
+| AAPL | AAPL | AAPL tracks the value of 1 share of common stock in Apple Inc. Apple designs consumer electronics, software, and services including the iPhone, Mac, iPad, and Apple Watch, generating revenue across hardware, digital services, and ecosystem products. |
+| AMD | AMD | AMD tracks the value of 1 share of common stock in Advanced Micro Devices, Inc. AMD designs high-performance processors and graphics chips used in PCs, gaming consoles, data centers, and AI workloads. |
+| AMZN | AMZN | AMZN tracks the value of 1 share of common stock in Amazon.com, Inc. Amazon operates a global e-commerce marketplace and cloud computing platform (AWS), alongside digital media and logistics services. |
+| BABA | BABA | BABA tracks the value of 1 American depositary share of Alibaba Group Holding Ltd. Alibaba operates e-commerce marketplaces, cloud services, and digital payments in China. |
+| COIN | COIN | COIN tracks the value of 1 share of common stock in Coinbase Global, Inc. Coinbase operates a cryptocurrency exchange providing trading, custody, and digital asset infrastructure. |
+| COST | COST | COST tracks the value of 1 share of common stock in Costco Wholesale Corporation. Costco operates membership-based warehouse retail stores offering bulk goods and groceries. |
+| CRCL | CRCL | CRCL tracks the value of 1 share of common stock in Circle Internet Group, Inc. Circle issues and manages USDC, a U.S. dollar-backed stablecoin, and provides digital asset infrastructure for payments and financial services. |
+| CRWV | CRWV | CRWV tracks the value of 1 share of common stock in CoreWeave, Inc. CoreWeave provides GPU cloud infrastructure optimized for AI and high-performance computing workloads. |
+| EWJ | EWJ | EWJ tracks the value of 1 share of the MSCI Japan ETF. The ETF seeks to track the investment results of an index composed of Japanese equities. |
+| EWY | EWY | EWY tracks the value of 1 share of the MSCI South Korea ETF. The ETF seeks to track the investment results of an index composed of South Korean equities. |
+| GME | GME | GME tracks the value of 1 share of common stock in GameStop Corp. GameStop is a retailer focused on video games, consumer electronics, and collectibles. |
+| GOOGL | GOOGL | GOOGL tracks the value of 1 share of Class A common stock in Alphabet Inc. Alphabet is the parent company of Google, operating search, advertising, cloud computing, and AI businesses, along with various technology subsidiaries. |
+| HOOD | HOOD | HOOD tracks the value of 1 share of common stock in Robinhood Markets, Inc. Robinhood operates a retail brokerage platform offering commission-free trading in equities, options, and cryptocurrencies to individual investors. |
+| INTC | INTC | INTC tracks the value of 1 share of common stock in Intel Corporation. Intel designs and manufactures semiconductors and computing platforms. The company produces CPUs and related hardware for personal computers, servers, and data centers. |
+| LLY | LLY | LLY tracks the value of 1 share of common stock in Eli Lilly and Company. Eli Lilly develops and manufactures pharmaceuticals, including treatments for diabetes, oncology, immunology, and other therapeutic areas. |
+| META | META | META tracks the value of 1 share of common stock in Meta Platforms, Inc. Meta operates social media and digital advertising platforms including Facebook, Instagram, and WhatsApp, and invests in virtual reality and metaverse technologies. |
+| MSTR | MSTR | MSTR tracks the value of 1 share of common stock in Strategy Inc (formerly MicroStrategy Incorporated). Strategy is a major corporate holder of Bitcoin as part of its treasury strategy. |
+| MU | MU | MU tracks the value of 1 share of common stock in Micron Technology, Inc. Micron manufactures DRAM and NAND flash memory for data centers, consumer electronics, and industrial systems. |
+| MSFT | MSFT | MSFT tracks the value of 1 share of common stock in Microsoft Corporation. Microsoft develops software, cloud computing services, and hardware. Its products include Windows, Office, Azure cloud infrastructure, and enterprise software solutions. |
+| NFLX | NFLX | NFLX tracks the value of 1 share of common stock in Netflix, Inc. Netflix operates a global subscription-based streaming service offering original and licensed film and television content. |
+| NVDA | NVDA | NVDA tracks the value of 1 share of common stock in NVIDIA Corporation. NVIDIA designs graphics processing units (GPUs) and AI computing platforms. Its chips power gaming, data centers, artificial intelligence, and advanced computing applications worldwide. |
+| ORCL | ORCL | ORCL tracks the value of 1 share of common stock in Oracle Corporation. Oracle provides enterprise software, cloud infrastructure, and database management systems. |
+| PLTR | PLTR | PLTR tracks the value of 1 share of common stock in Palantir Technologies, Inc. Palantir develops data analytics and artificial intelligence software platforms used by governments and enterprises for large-scale data integration and analysis. |
+| RIVN | RIVN | RIVN tracks the value of 1 share of common stock in Rivian Automotive, Inc. Rivian designs and manufactures electric adventure vehicles and commercial delivery vans. |
+| SNDK | SNDK | SNDK tracks the value of 1 share of common stock in Sandisk Corporation. Sandisk develops and manufactures flash memory storage solutions used in consumer electronics, enterprise systems, and data infrastructure. |
+| TSLA | TSLA | TSLA tracks the value of 1 share of common stock in Tesla, Inc. Tesla designs and manufactures electric vehicles, battery energy storage systems, and solar products. The company is a global leader in EV production and autonomous driving technology. |
+| TSM | TSM | TSM tracks the value of 1 American depositary share of Taiwan Semiconductor Manufacturing Company (TSMC). TSMC is the world's largest dedicated semiconductor foundry, manufacturing advanced chips for global technology companies. |
+| USAR | USAR | USAR tracks the value of 1 share of common stock in USA Rare Earth, Inc. The company develops domestic rare earth supply chains for critical technologies and defense applications. |
+| URNM | URNM | URNM tracks the value of 1 share of Sprott Uranium Miners ETF. The fund provides exposure to uranium mining companies and physical uranium holdings. |
+
+## API identifiers
+
+Each US equity uses the `xyz:SYMBOL` coin format. For example:
+
+- `xyz:TSLA` — Tesla
+- `xyz:NVDA` — NVIDIA
+- `xyz:AAPL` — Apple
+- `xyz:MSFT` — Microsoft
+
+Refer to the full annotations data for the complete list of coin identifiers, categories, and search keywords.

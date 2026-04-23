@@ -1,0 +1,108 @@
+---
+title: "How Trade[XYZ] Works: Mechanics and Pricing Explained"
+description: "Learn how perpetual futures, multi-source oracle pricing, automatic contract rolls, and margin modes power every market on Trade[XYZ] (MevX)."
+---
+
+Trade[XYZ] (MevX) is built on a set of interconnected mechanisms that keep markets fair, continuous, and manipulation-resistant. This page walks you through each of those mechanisms — from how perpetual futures work as an instrument, to how prices are derived, how contracts are rolled, and how margin protects both you and the platform.
+
+## Perpetual futures
+
+A perpetual future is a derivative contract that tracks the price of an underlying asset — but unlike a traditional futures contract, it has no expiry date. You can hold a position indefinitely, and the platform keeps the perpetual's price anchored to the underlying asset through a **funding rate**.
+
+### How the funding rate works
+
+The funding rate is a periodic payment exchanged between long and short position holders. When the perpetual trades above the underlying (spot or reference) price, longs pay shorts, which pushes the perpetual price down toward the reference. When the perpetual trades below, shorts pay longs, which pushes it back up.
+
+<Info>
+  The funding rate is the economic mechanism that replaces expiry. Instead of forcing settlement, it continuously nudges the perpetual price toward its reference, keeping the two in sync.
+</Info>
+
+### Perpetuals vs. traditional futures
+
+| | Traditional futures | Perpetual futures |
+|--|--|--|
+| Expiry | Fixed date | None |
+| Settlement | Cash or physical delivery | No settlement required |
+| Price anchor | Convergence at expiry | Funding rate |
+| Rolling | Manual or via roll contracts | Handled by the platform |
+
+## Oracle pricing
+
+Every market on Trade[XYZ] is priced through a **multi-source oracle** — a system that aggregates price data from multiple independent providers and derives three distinct price values used for different purposes.
+
+<Steps>
+  <Step title="Providers submit prices">
+    Multiple independent data providers each submit a current price for the asset. No single provider can unilaterally move the market.
+  </Step>
+  <Step title="Oracle price is computed">
+    The platform computes the **oracle price** as the median of the submitted provider prices. Using a median rather than an average makes the oracle resistant to outliers and manipulation from any single source.
+  </Step>
+  <Step title="Mark price is derived">
+    The **mark price** is derived from the oracle price and is used to calculate your unrealized P&L and to determine whether a position should be liquidated. It is designed to be stable and resistant to sudden jumps.
+  </Step>
+  <Step title="External price sets the boundary">
+    The **external price** is sourced from reference markets and is used to limit how far the mark price can deviate from the broader market. This prevents coordinated manipulation from moving the mark price far enough to trigger artificial liquidations.
+  </Step>
+  <Step title="Prices are clamped">
+    All price transitions are subject to **clamping** — the system prevents any single price update from causing a sudden, outsized jump. Clamping protects you from flash crashes or spike manipulation.
+  </Step>
+</Steps>
+
+<Warning>
+  The mark price — not the last trade price — determines your P&L and liquidation threshold. Make sure you understand the difference before sizing a position.
+</Warning>
+
+## Asset categories and oracle design
+
+Different asset classes require different oracle approaches because their underlying reference markets operate differently.
+
+<CardGroup cols={2}>
+  <Card title="Stocks" icon="chart-line">
+    Stock perps reference real-time spot prices from equity markets. The oracle aggregates prices from multiple equity data providers and computes a median spot price. Extended-hours trading uses the same oracle with prices from pre-market and after-hours sessions.
+  </Card>
+  <Card title="Indices" icon="chart-bar">
+    Index perps (XYZ100, SP500, JP225, KR200, CSI300, VIX) reference the most liquid underlying **futures contracts** for each index rather than spot. This means the oracle tracks the futures market, not the cash index directly.
+  </Card>
+  <Card title="Commodities" icon="cube">
+    Commodity perps (Gold, WTI Crude, Brent, Natural Gas, Silver, Copper) also reference underlying futures contracts traded on CME Globex. The oracle aggregates prices from the front-month or nearby futures contract.
+  </Card>
+  <Card title="FX" icon="dollar-sign">
+    FX perps (EUR/USD, USD/JPY, DXY) use a continuous oracle sourced from FX data providers. Because FX markets run nearly 24 hours a day, FX perps have the most continuous price coverage of any asset class on the platform.
+  </Card>
+</CardGroup>
+
+## Contract rolls
+
+Because index and commodity perps reference underlying futures contracts — not spot prices — those contracts eventually expire. Before expiry, the oracle must switch its reference from the expiring contract to the next one. This process is called a **roll**.
+
+<Steps>
+  <Step title="Roll schedule is published">
+    Each commodity and index asset has a published roll calendar. You can find per-asset roll dates in the [Asset Directory](/asset-directory/roll-calendar).
+  </Step>
+  <Step title="Platform rolls the reference automatically">
+    Before the front-month contract expires, Trade[XYZ] automatically updates the oracle reference to the next contract. You do not need to take any action to maintain your exposure.
+  </Step>
+  <Step title="Your position continues uninterrupted">
+    Because the perpetual never expires itself, your position remains open through the roll. The oracle reference changes; your position does not.
+  </Step>
+</Steps>
+
+<Note>
+  Roll dates can affect basis — the difference between the perpetual price and the new front-month contract price. Check the [roll calendar](/asset-directory/roll-calendar) if you are holding a commodity or index position around a scheduled roll.
+</Note>
+
+## Margin modes
+
+Trade[XYZ] supports two margin modes. You choose which one applies when you open a position.
+
+### Cross-margin
+
+In cross-margin mode, all your open positions share a single collateral pool. Profits from one position can absorb losses from another. This gives you more efficient use of capital but means that a losing position can draw down collateral that is protecting other positions.
+
+### Isolated-margin
+
+In isolated-margin mode, each position has its own dedicated collateral allocation. The maximum you can lose on a single position is the margin you assigned to it — losses cannot spill over to other positions.
+
+<Tip>
+  Use isolated-margin when you want to take a higher-risk position without putting your entire account at risk. Use cross-margin when you are managing a portfolio of correlated positions and want to reduce overall collateral requirements.
+</Tip>

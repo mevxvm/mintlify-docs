@@ -1,0 +1,115 @@
+---
+title: 'VIX Perpetual — Volatility Trading on Trade[XYZ]'
+description: 'Trade VIX perpetuals on Trade[XYZ]: cash-index oracle, published hours, contango dynamics, and use cases for equity hedging and volatility speculation.'
+---
+
+The VIX perpetual on Trade[XYZ] gives you direct long or short exposure to implied stock market volatility — without the structural decay that plagues VIX ETPs or the roll costs of managing VIX futures yourself. VIX is the CBOE Volatility Index, calculated by Cboe from real-time SPX option quotes and widely regarded as the market's primary gauge of near-term fear and uncertainty.
+
+## What VIX measures
+
+VIX measures the market's expectation of 30-day annualized volatility on the S&P 500, derived from the prices of SPX options across a range of strikes and two nearest expiration dates. A VIX of 20 implies the market expects roughly ±20% annualized moves — or about ±5.8% per month — in the S&P 500.
+
+Cboe calculates and publishes VIX continuously during trading hours. Because VIX is derived from option quotes rather than a tradable asset, it cannot be purchased directly. VIX perps on Trade[XYZ] solve this by letting you establish leveraged long or short volatility positions against the live VIX cash index.
+
+**Coin**: `xyz:VIX` | **Category**: indices
+
+## Oracle design
+
+Trade[XYZ] uses the **VIX cash index as the oracle reference**, not VIX futures. This is a deliberate architectural choice.
+
+| Session | Oracle input |
+|---------|-------------|
+| RTH (9:30 AM – 4:00 PM ET) | VIX cash index directly |
+| Extended hours (GTH) | VIX cash with EMA smoother applied for wider bid-ask noise |
+| Weekends / holidays | EMA-based pricing derived from last available impact price |
+
+<Note>
+During regular trading hours (RTH), VIX is high quality and tightly arbitraged. During global trading hours (GTH), precision is degraded — SPX option spreads widen, fewer market makers are active, and the SPX itself is not published. The oracle applies an EMA smoother during these periods.
+</Note>
+
+### Why the oracle uses VIX cash, not VIX futures
+
+VIX futures (symbol: VX on CFE; mini: VXM) trade at a significant and volatile premium to the cash VIX — the M1:M2 spread averages roughly 5.6% in contango. Products that reference VIX futures directly suffer from severe roll decay: VXX lost approximately 99.9% of its value since inception due to continuously rolling from cheaper near-term futures into more expensive next-month contracts.
+
+A futures-referenced oracle would either create ~5% price jumps on roll days or introduce structural decay into the perpetual price. By referencing the VIX cash index, Trade[XYZ] avoids both problems. The perpetual's funding rate continuously captures the volatility risk premium — which is how crypto perpetuals work generally (spot reference, not futures).
+
+## Published hours
+
+Cboe calculates and publishes VIX during two daily windows on weekdays:
+
+| Window | Hours (CT) | Notes |
+|--------|-----------|-------|
+| Early session | 2:15 AM – 8:25 AM | Global trading hours |
+| Main session | 8:30 AM – 3:15 PM | Includes full US equity RTH |
+
+VIX is published approximately 4 times per minute during these windows. **VIX is dark on weekends and US market holidays.**
+
+Total weekday coverage: approximately 18.5 hours per day.
+
+## Contango and premium dynamics
+
+VIX perps on Trade[XYZ] tend to trade at a **premium to the spot VIX cash index**. This happens because VIX futures — the instrument most arbitrageurs would use to hedge a VIX perp — are almost always in contango: VX M1 expires above the current cash VIX, M2 above M1, and so on.
+
+<Warning>
+Being long the VIX perpetual has a structural cost in normal market conditions. You pay the volatility risk premium through the funding rate when VIX futures are in contango. This cost can be significant during low-volatility periods.
+</Warning>
+
+The contango structure flips during volatility spikes. When markets sell off sharply, VIX can surge 30–60%+ in a single session (on August 5, 2024, VIX rose approximately 65% intraday). In those conditions, the VIX term structure can invert to backwardation, and funding flows in the long holder's favor.
+
+## No roll mechanics
+
+Unlike commodity perpetuals on Trade[XYZ], the VIX perpetual does **not** roll between futures contracts. The oracle references the VIX cash index throughout the year. There is no roll date, no basis adjustment, and no contract-month transition to manage.
+
+## Volatility trading use cases
+
+<Tabs>
+  <Tab title="Equity hedge">
+
+### Hedge a long equity portfolio
+
+VIX has a strong negative correlation with the S&P 500. When equity markets fall sharply, VIX tends to spike — often dramatically. A long VIX position can offset drawdowns in a long equity or crypto portfolio during risk-off events.
+
+You can size a VIX hedge based on your portfolio's delta or simply hold a small structural long as tail-risk insurance. The cost of carry (funding when VIX is in contango) is the premium you pay for that insurance.
+
+  </Tab>
+  <Tab title="Event speculation">
+
+### Speculate on volatility events
+
+Volatility tends to spike around scheduled macro events and compress during quiet periods. You can position directionally in VIX ahead of:
+
+- **FOMC decisions** — unexpected rate moves or hawkish/dovish pivots can trigger sharp VIX moves
+- **Earnings seasons** — broad earnings uncertainty can elevate implied volatility
+- **Elections and geopolitical events** — political uncertainty historically lifts VIX in the weeks before and collapses it after
+
+Going short VIX (selling volatility) after a spike can capture mean-reversion as markets stabilize.
+
+  </Tab>
+  <Tab title="Pair trades">
+
+### Pair VIX against individual stocks
+
+Because VIX and equities are inversely correlated, you can structure relative value trades — for example, long VIX against short NVDA or long VIX against short SP500. This can reduce directional market exposure while expressing a view on volatility versus a specific equity's implied vol.
+
+Pair trades are most effective when you have a view on the spread between market-wide volatility (VIX) and the implied volatility of a specific stock or sector.
+
+  </Tab>
+</Tabs>
+
+## Key risks
+
+<Warning>
+VIX has extremely high volatility-of-volatility (~100–120% annualized, compared to ~15–20% for SPX). Maximum leverage on VIX positions is lower than for most other assets. Size positions accordingly.
+</Warning>
+
+- **Contango decay**: Long VIX positions bleed funding costs during sustained low-volatility periods
+- **Spike and revert**: VIX spikes are often fast and followed by rapid mean-reversion — timing matters
+- **Weekend gaps**: VIX is dark on weekends; significant events over the weekend can cause large gaps at Monday open
+- **GTH precision**: Extended-hours oracle quality is degraded relative to RTH; wider effective spreads apply
+
+## Resources
+
+- [VIX Methodology (Cboe PDF)](https://cdn.cboe.com/resources/indices/Volatility_Index_Methodology_Cboe_Volatility_Index.pdf)
+- [VIX Mathematics Methodology (Cboe PDF)](https://cdn.cboe.com/resources/indices/Cboe_Volatility_Index_Mathematics_Methodology.pdf)
+- [VIX Options Specifications (Cboe)](https://www.cboe.com/tradable-products/vix/vix-options/specifications/)
+- [VIX Spike August 2024 Analysis (BIS)](https://www.bis.org/publ/bisbull95.pdf)

@@ -1,0 +1,114 @@
+---
+title: "Stock Perpetuals: US and International Equities"
+description: "Trade perpetual futures on individual stocks from NYSE, NASDAQ, and select exchanges in Korea, Japan, and China — no rolls, 24/7 pricing."
+---
+
+Trade[XYZ] lists perpetual futures on individual equities from US and international exchanges. Unlike traditional stock futures, stock perps reference real-time spot prices directly — there are no roll mechanics, no expiry dates, and no basis risk from futures rollover. You hold a position that tracks the underlying share price continuously.
+
+## US equities
+
+US stock perps cover companies listed on NYSE and NASDAQ. Trading coverage includes regular trading hours (RTH) plus extended hours (pre-market and after-hours), giving you access to price moves around earnings announcements and other after-hours events.
+
+<Tabs>
+  <Tab title="Technology & growth">
+    | Ticker | Company |
+    |---|---|
+    | TSLA | Tesla, Inc. |
+    | NVDA | NVIDIA Corporation |
+    | AAPL | Apple Inc. |
+    | MSFT | Microsoft Corporation |
+    | GOOGL | Alphabet Inc. (Class A) |
+    | META | Meta Platforms, Inc. |
+    | AMZN | Amazon.com, Inc. |
+    | AMD | Advanced Micro Devices, Inc. |
+    | NFLX | Netflix, Inc. |
+    | ORCL | Oracle Corporation |
+    | PLTR | Palantir Technologies, Inc. |
+    | CRWV | CoreWeave, Inc. |
+  </Tab>
+  <Tab title="Crypto & fintech">
+    | Ticker | Company |
+    |---|---|
+    | COIN | Coinbase Global, Inc. |
+    | HOOD | Robinhood Markets, Inc. |
+    | MSTR | Strategy Inc. (Bitcoin treasury company) |
+    | CRCL | Circle Internet Group, Inc. |
+  </Tab>
+  <Tab title="Semiconductors & memory">
+    | Ticker | Company |
+    |---|---|
+    | MU | Micron Technology, Inc. |
+    | SNDK | Sandisk Corporation |
+    | TSM | TSMC (American depositary share) |
+  </Tab>
+  <Tab title="Other sectors">
+    | Ticker | Company |
+    |---|---|
+    | GME | GameStop Corp. |
+    | RIVN | Rivian Automotive, Inc. |
+    | LLY | Eli Lilly and Company |
+    | COST | Costco Wholesale Corporation |
+    | USAR | USA Rare Earth, Inc. |
+    | URNM | Sprott Uranium Miners ETF |
+    | EWJ | iShares MSCI Japan ETF |
+    | EWY | iShares MSCI South Korea ETF |
+  </Tab>
+</Tabs>
+
+## International equities
+
+Foreign equity perps are **composite** instruments. The oracle prices each share in its native currency and converts to USD at the prevailing spot FX rate. Your PnL reflects both the equity price move and the USD FX move over the same period.
+
+<Tabs>
+  <Tab title="Korea">
+    Korean stocks are priced in KRW and converted to USD (KRW → USD).
+
+    | Ticker | Company | Exchange |
+    |---|---|---|
+    | SMSN | Samsung Electronics Co., Ltd. | KRX |
+    | SKHX | SK Hynix Inc. | KRX |
+    | HYUNDAI | Hyundai Motor Company | KRX |
+
+    **Trading hours** — KRX regular session: 09:00–15:30 KST. Nextrade ATS (NXT) extended session: 08:00–20:00 KST.
+  </Tab>
+  <Tab title="Japan">
+    Japanese stocks are priced in JPY and converted to USD (JPY → USD).
+
+    | Ticker | Company | Exchange |
+    |---|---|---|
+    | SOFTBANK | SoftBank Group Corp. | TSE |
+    | KIOXIA | Kioxia Holdings Corporation | TSE |
+
+    **Trading hours** — TSE regular session: 09:00–15:30 JST. Japanext PTS night session: 16:30–23:59 JST.
+  </Tab>
+  <Tab title="China">
+    Chinese equities trade on the Shanghai Stock Exchange (SSE), Shenzhen Stock Exchange (SZSE), and Hong Kong Exchange (HKEX).
+
+    **Trading hours** — Approximately 4 hours of daytime coverage per session.
+  </Tab>
+</Tabs>
+
+<Warning>
+  Because foreign equity perps convert native currency prices to USD in real time, your exposure includes both the equity and the FX rate. A move in USD/KRW or USD/JPY will affect your position's USD value even if the underlying share price is unchanged.
+</Warning>
+
+## Trading hours by region
+
+| Region | Exchange | Regular session | Extended / ATS |
+|---|---|---|---|
+| United States | NYSE, NASDAQ | 09:30–16:00 ET | Pre-market + after-hours |
+| Korea | KRX | 09:00–15:30 KST | Nextrade ATS 08:00–20:00 KST |
+| Japan | TSE | 09:00–15:30 JST | Japanext PTS 16:30–23:59 JST |
+| China | SSE, SZSE, HKEX | ~4h daytime | — |
+
+<Note>
+  Stock perps have no roll mechanics. There is no futures contract underneath — the oracle references the real-time spot price of the underlying equity, so you never need to manage a roll or track a basis.
+</Note>
+
+## How stock perp prices are determined
+
+Each stock perp tracks the real-time spot price of the underlying share. During US regular trading hours, the oracle sources prices directly from NYSE and NASDAQ feeds. During extended hours and overnight, the oracle continues to reference available price feeds, including ATS and PTS sessions where applicable.
+
+<Tip>
+  Use EWY (iShares MSCI South Korea ETF) or EWJ (iShares MSCI Japan ETF) for broad regional exposure without the individual-stock FX composite mechanics.
+</Tip>

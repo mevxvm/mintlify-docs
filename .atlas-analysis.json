@@ -1,0 +1,110 @@
+{
+  "projectType": "saas",
+  "projectName": "MevX — Trade[XYZ]",
+  "projectDescription": "Trade[XYZ] is a next-generation perpetual futures platform that lets you trade equities, indices, commodities, and FX 24/7 on-chain.",
+  "theme": "luma",
+  "primaryColor": "#6780ce",
+  "lightColor": "#2c927c",
+  "darkColor": "#0e151d",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "how-it-works"
+            ]
+          },
+          {
+            "group": "Markets",
+            "pages": [
+              "markets/overview",
+              "markets/stocks",
+              "markets/indices",
+              "markets/commodities",
+              "markets/fx"
+            ]
+          },
+          {
+            "group": "Mechanism",
+            "pages": [
+              "mechanism/pricing",
+              "mechanism/rolls",
+              "mechanism/price-bands"
+            ]
+          },
+          {
+            "group": "Trading",
+            "pages": [
+              "trading/perpetuals",
+              "trading/margin",
+              "trading/liquidations"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Asset Directory",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "asset-directory/overview",
+              "asset-directory/roll-calendar"
+            ]
+          },
+          {
+            "group": "Equities",
+            "pages": [
+              "asset-directory/us-stocks",
+              "asset-directory/international-stocks"
+            ]
+          },
+          {
+            "group": "Indices",
+            "pages": [
+              "asset-directory/equity-indices",
+              "asset-directory/volatility"
+            ]
+          },
+          {
+            "group": "Commodities",
+            "pages": [
+              "asset-directory/energy",
+              "asset-directory/precious-metals",
+              "asset-directory/base-metals"
+            ]
+          },
+          {
+            "group": "FX",
+            "pages": [
+              "asset-directory/fx-pairs"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Perpetual futures on equities, indices, commodities, and FX",
+    "24/7 trading including extended hours and weekend sessions",
+    "Multi-source oracle with median price derivation (oracle, mark, external)",
+    "Automatic contract rolls with 5-step linear transition for commodities",
+    "Quarterly roll for equity index futures at 10:00 ET",
+    "Cross-margin and isolated-margin modes",
+    "Global asset coverage: US, Korean, Japanese equities + major indices",
+    "Price band clamping to prevent oracle manipulation"
+  ],
+  "publicApiSurface": [
+    "Oracle price feed: oraclePx, mark1Px, mark2Px, externalPerpPx per asset",
+    "Asset symbols: XYZ100, SP500, JP225, KR200, CSI300, VIX, TSLA, NVDA, AAPL, MSFT, GOLD, CL, NATGAS, EURUSD, USDJPY, DXY",
+    "Roll calendar: ts_roll and ts_expiration timestamps per contract",
+    "Asset annotations: coin, category, displayName, keywords, description",
+    "setGlobal broadcast endpoint for price submissions",
+    "WebSocket stream: wss://stream.tradexyz.com/v1",
+    "REST API: https://api.tradexyz.com/v1"
+  ]
+}

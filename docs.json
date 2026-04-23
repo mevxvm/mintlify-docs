@@ -1,0 +1,103 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "MevX",
+  "theme": "luma",
+  "logo": {
+    "light": "https://media.brand.dev/d37fc696-9a86-4423-9c87-6ccd136a7676.svg",
+    "dark": "https://media.brand.dev/d37fc696-9a86-4423-9c87-6ccd136a7676.svg"
+  },
+  "favicon": "https://media.brand.dev/5cb47453-0942-4285-8fb0-cc55e8be0d76.jpg",
+  "colors": {
+    "primary": "#6780ce",
+    "light": "#2c927c",
+    "dark": "#0e151d"
+  },
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/trade-xyz/tradexyz"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "how-it-works"
+            ]
+          },
+          {
+            "group": "Markets",
+            "pages": [
+              "markets/overview",
+              "markets/stocks",
+              "markets/indices",
+              "markets/commodities",
+              "markets/fx"
+            ]
+          },
+          {
+            "group": "Mechanism",
+            "pages": [
+              "mechanism/pricing",
+              "mechanism/rolls",
+              "mechanism/price-bands"
+            ]
+          },
+          {
+            "group": "Trading",
+            "pages": [
+              "trading/perpetuals",
+              "trading/margin",
+              "trading/liquidations"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Asset Directory",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "asset-directory/overview",
+              "asset-directory/roll-calendar"
+            ]
+          },
+          {
+            "group": "Equities",
+            "pages": [
+              "asset-directory/us-stocks",
+              "asset-directory/international-stocks"
+            ]
+          },
+          {
+            "group": "Indices",
+            "pages": [
+              "asset-directory/equity-indices",
+              "asset-directory/volatility"
+            ]
+          },
+          {
+            "group": "Commodities",
+            "pages": [
+              "asset-directory/energy",
+              "asset-directory/precious-metals",
+              "asset-directory/base-metals"
+            ]
+          },
+          {
+            "group": "FX",
+            "pages": [
+              "asset-directory/fx-pairs"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

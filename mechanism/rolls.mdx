@@ -1,0 +1,208 @@
+---
+title: "How Index and Commodity Contract Rolls Work on Trade[XYZ]"
+description: "Understand how and when Trade[XYZ] rolls commodity and equity index perps to the next futures contract — and what it means for your open positions."
+---
+
+Trade[XYZ] perpetual futures on commodities and equity indices reference real underlying futures contracts. Those contracts have expiration dates, so the platform periodically "rolls" its reference from the expiring contract to the next one. As a trader, your position stays open through the roll — there is no action required on your part — but understanding when rolls happen and how they work helps you anticipate any brief price behavior around roll dates.
+
+## Why rolls are necessary
+
+Commodity and index perps are not priced against spot markets directly. They track listed futures contracts (such as WTI Crude's front-month contract on NYMEX, or the Nasdaq 100 quarterly contract on CME). When one of those underlying contracts approaches expiration, continuing to reference it would produce a distorted or eventually broken price. The roll process switches the platform's reference to the next active contract in a controlled way.
+
+<Info>
+  Your perpetual position is unaffected by the roll in terms of contract size, margin, or open interest. The roll only changes which underlying futures contract the oracle and pricing system track.
+</Info>
+
+## Equity index rolls
+
+Equity index perps — **XYZ100** (Nasdaq 100 / NQ) and **SP500** (S&P 500 / ES) — follow quarterly contracts expiring in March, June, September, and December.
+
+<Steps>
+  <Step title="Roll trigger">
+    The roll happens at **10:00 ET on the Monday before expiration week**. This aligns with CME's standard quarterly roll convention.
+  </Step>
+  <Step title="Price conversion">
+    The roll is instantaneous. The platform converts the expiring futures price to an equivalent spot price using the cost-of-carry model:
+
+    ```
+    S = F × e^(-(r-q)T)
+    ```
+
+    Where `F` is the futures price, `r` is the risk-free rate, `q` is the dividend yield, and `T` is time to expiration. This eliminates the price gap between contracts so you see a seamless transition.
+  </Step>
+  <Step title="New contract active">
+    After the roll, all price feeds reference the new quarterly contract. The spread between contracts is negligible once the cost-of-carry conversion is applied.
+  </Step>
+</Steps>
+
+### 2026 roll schedule — XYZ100 (NQ) and SP500 (ES)
+
+Both indices follow the same quarterly roll dates. The timestamps below are UTC.
+
+<Tabs>
+  <Tab title="XYZ100 (NQ)">
+    ```json
+    {
+      "NQH6": {
+        "ts_roll":       "2026-03-16T14:00:00Z",
+        "ts_expiration": "2026-03-20T13:30:00Z"
+      },
+      "NQM6": {
+        "ts_roll":       "2026-06-15T14:00:00Z",
+        "ts_expiration": "2026-06-18T13:30:00Z"
+      },
+      "NQU6": {
+        "ts_roll":       "2026-09-14T14:00:00Z",
+        "ts_expiration": "2026-09-18T13:30:00Z"
+      },
+      "NQZ6": {
+        "ts_roll":       "2026-12-14T15:00:00Z",
+        "ts_expiration": "2026-12-18T14:30:00Z"
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="SP500 (ES)">
+    ```json
+    {
+      "ESH6": {
+        "ts_roll":       "2026-03-16T14:00:00Z",
+        "ts_expiration": "2026-03-20T13:30:00Z"
+      },
+      "ESM6": {
+        "ts_roll":       "2026-06-15T14:00:00Z",
+        "ts_expiration": "2026-06-18T13:30:00Z"
+      },
+      "ESU6": {
+        "ts_roll":       "2026-09-14T14:00:00Z",
+        "ts_expiration": "2026-09-18T13:30:00Z"
+      },
+      "ESZ6": {
+        "ts_roll":       "2026-12-14T15:00:00Z",
+        "ts_expiration": "2026-12-18T14:30:00Z"
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  The December contract (`Z6`) rolls slightly later in the day (15:00 UTC / 10:00 ET standard time) because clocks have fallen back. All other quarters roll at 14:00 UTC (10:00 ET daylight time).
+</Note>
+
+## Commodity rolls
+
+Commodity perps — WTI Crude (CL), Brent Crude (BZ), Natural Gas (NG), and Copper (HG) — use a **multi-stage linear roll** spread over five business days. This gradual approach mirrors the methodology used by the S&P GSCI and Bloomberg Commodity Index (BCOM).
+
+<Steps>
+  <Step title="Roll window opens (BD5)">
+    On business day 5 of the roll month, the platform begins transitioning weight from the expiring contract to the next contract. Roll events happen at **17:30 ET** each day.
+  </Step>
+  <Step title="Linear transition (BD5–BD9)">
+    Over five roll steps, the platform shifts its reference price linearly between the outgoing and incoming contracts. Each step moves one-fifth of the weight. This smooths any price difference between the two contract months.
+  </Step>
+  <Step title="Fully rolled (BD10)">
+    By business day 10, the platform is entirely on the new contract. The outgoing contract is no longer referenced.
+  </Step>
+</Steps>
+
+<Tip>
+  The five-step transition means any spread between the expiring and front-month contracts is absorbed gradually rather than all at once. Under normal conditions, you should see no meaningful price jump during the roll window.
+</Tip>
+
+### Active contract months by asset
+
+Not all commodity assets trade every calendar month. This table shows which contract months are active on Trade[XYZ].
+
+| Asset | Exchange | Active months |
+|-------|----------|---------------|
+| WTI Crude (CL) | NYMEX | All 12 months |
+| Brent Crude (BZ) | ICE/NYMEX | All 12 months |
+| Natural Gas (NG) | NYMEX | All 12 months |
+| Copper (HG) | COMEX | H, K, N, U, Z only |
+
+Copper trades only five contract months per year, so its roll calendar is less frequent than energy contracts.
+
+### Month code reference
+
+Futures contract codes use single-letter month designators. Here is the full mapping:
+
+| Code | Month | Code | Month |
+|------|-------|------|-------|
+| F | January | N | July |
+| G | February | Q | August |
+| H | March | U | September |
+| J | April | V | October |
+| K | May | X | November |
+| M | June | Z | December |
+
+A contract labeled `CLG6` is WTI Crude (CL), February (G) of 2026. `NQH6` is Nasdaq 100 (NQ), March (H) of 2026.
+
+### Active contract by calendar month
+
+The table below shows which contract code is active for each asset in each calendar month of the year.
+
+| Asset | Jan | Feb | Mar | Apr | May | Jun | Jul | Aug | Sep | Oct | Nov | Dec |
+|-------|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
+| XYZ100 | H | H | H | M | M | M | U | U | U | Z | Z | Z |
+| SP500  | H | H | H | M | M | M | U | U | U | Z | Z | Z |
+| CL (WTI)  | G | H | J | K | M | N | Q | U | V | X | Z | F+1 |
+| BZ (Brent) | H | J | K | M | N | Q | U | V | X | Z | F+1 | G+1 |
+| NG (Nat Gas) | G | H | J | K | M | N | Q | U | V | X | Z | F+1 |
+| HG (Copper) | H | H | K | K | N | N | U | U | Z | Z | Z | H+1 |
+
+`+1` denotes the same month code but in the following calendar year.
+
+<AccordionGroup>
+  <Accordion title="WTI Crude (CL) — 2026 roll schedule">
+    ```json
+    {
+      "CLG6": { "ts_rolls": ["2026-01-08T22:30:00Z", "2026-01-09T22:30:00Z", "2026-01-12T22:30:00Z", "2026-01-13T22:30:00Z", "2026-01-14T22:30:00Z"], "ts_expiration": "2026-01-20T19:30:00Z" },
+      "CLH6": { "ts_rolls": ["2026-02-06T22:30:00Z", "2026-02-09T22:30:00Z", "2026-02-10T22:30:00Z", "2026-02-11T22:30:00Z", "2026-02-12T22:30:00Z"], "ts_expiration": "2026-02-20T19:30:00Z" },
+      "CLJ6": { "ts_rolls": ["2026-03-06T22:30:00Z", "2026-03-09T21:30:00Z", "2026-03-10T21:30:00Z", "2026-03-11T21:30:00Z", "2026-03-12T21:30:00Z"], "ts_expiration": "2026-03-20T18:30:00Z" },
+      "CLK6": { "ts_rolls": ["2026-04-08T21:30:00Z", "2026-04-09T21:30:00Z", "2026-04-10T21:30:00Z", "2026-04-13T21:30:00Z", "2026-04-14T21:30:00Z"], "ts_expiration": "2026-04-21T18:30:00Z" },
+      "CLM6": { "ts_rolls": ["2026-05-07T21:30:00Z", "2026-05-08T21:30:00Z", "2026-05-11T21:30:00Z", "2026-05-12T21:30:00Z", "2026-05-13T21:30:00Z"], "ts_expiration": "2026-05-19T18:30:00Z" },
+      "CLN6": { "ts_rolls": ["2026-06-05T21:30:00Z", "2026-06-08T21:30:00Z", "2026-06-09T21:30:00Z", "2026-06-10T21:30:00Z", "2026-06-11T21:30:00Z"], "ts_expiration": "2026-06-22T18:30:00Z" }
+    }
+    ```
+  </Accordion>
+  <Accordion title="Brent Crude (BZ) — 2026 roll schedule">
+    ```json
+    {
+      "BZH6": { "ts_rolls": ["2026-01-08T22:30:00Z", "2026-01-09T22:30:00Z", "2026-01-12T22:30:00Z", "2026-01-13T22:30:00Z", "2026-01-14T22:30:00Z"], "ts_expiration": "2026-01-30T18:30:00Z" },
+      "BZJ6": { "ts_rolls": ["2026-02-06T22:30:00Z", "2026-02-09T22:30:00Z", "2026-02-10T22:30:00Z", "2026-02-11T22:30:00Z", "2026-02-12T22:30:00Z"], "ts_expiration": "2026-02-27T18:30:00Z" },
+      "BZK6": { "ts_rolls": ["2026-03-06T22:30:00Z", "2026-03-09T21:30:00Z", "2026-03-10T21:30:00Z", "2026-03-11T21:30:00Z", "2026-03-12T21:30:00Z"], "ts_expiration": "2026-03-31T18:30:00Z" },
+      "BZM6": { "ts_rolls": ["2026-04-08T21:30:00Z", "2026-04-09T21:30:00Z", "2026-04-10T21:30:00Z", "2026-04-13T21:30:00Z", "2026-04-14T21:30:00Z"], "ts_expiration": "2026-04-30T18:30:00Z" },
+      "BZN6": { "ts_rolls": ["2026-05-07T21:30:00Z", "2026-05-08T21:30:00Z", "2026-05-11T21:30:00Z", "2026-05-12T21:30:00Z", "2026-05-13T21:30:00Z"], "ts_expiration": "2026-05-29T18:30:00Z" },
+      "BZQ6": { "ts_rolls": ["2026-06-05T21:30:00Z", "2026-06-08T21:30:00Z", "2026-06-09T21:30:00Z", "2026-06-10T21:30:00Z", "2026-06-11T21:30:00Z"], "ts_expiration": "2026-06-30T18:30:00Z" }
+    }
+    ```
+  </Accordion>
+  <Accordion title="Natural Gas (NG) — 2026 roll schedule">
+    ```json
+    {
+      "NGG6": { "ts_rolls": ["2026-01-08T22:30:00Z", "2026-01-09T22:30:00Z", "2026-01-12T22:30:00Z", "2026-01-13T22:30:00Z", "2026-01-14T22:30:00Z"], "ts_expiration": "2026-01-28T19:30:00Z" },
+      "NGH6": { "ts_rolls": ["2026-02-06T22:30:00Z", "2026-02-09T22:30:00Z", "2026-02-10T22:30:00Z", "2026-02-11T22:30:00Z", "2026-02-12T22:30:00Z"], "ts_expiration": "2026-02-25T19:30:00Z" },
+      "NGJ6": { "ts_rolls": ["2026-03-06T22:30:00Z", "2026-03-09T21:30:00Z", "2026-03-10T21:30:00Z", "2026-03-11T21:30:00Z", "2026-03-12T21:30:00Z"], "ts_expiration": "2026-03-27T18:30:00Z" },
+      "NGK6": { "ts_rolls": ["2026-04-08T21:30:00Z", "2026-04-09T21:30:00Z", "2026-04-10T21:30:00Z", "2026-04-13T21:30:00Z", "2026-04-14T21:30:00Z"], "ts_expiration": "2026-04-28T18:30:00Z" },
+      "NGM6": { "ts_rolls": ["2026-05-07T21:30:00Z", "2026-05-08T21:30:00Z", "2026-05-11T21:30:00Z", "2026-05-12T21:30:00Z", "2026-05-13T21:30:00Z"], "ts_expiration": "2026-05-27T18:30:00Z" },
+      "NGN6": { "ts_rolls": ["2026-06-05T21:30:00Z", "2026-06-08T21:30:00Z", "2026-06-09T21:30:00Z", "2026-06-10T21:30:00Z", "2026-06-11T21:30:00Z"], "ts_expiration": "2026-06-26T18:30:00Z" }
+    }
+    ```
+  </Accordion>
+  <Accordion title="Copper (HG) — 2026 roll schedule (H/K/N/U/Z only)">
+    ```json
+    {
+      "HGH6": { "ts_rolls": ["2026-02-06T22:30:00Z", "2026-02-09T22:30:00Z", "2026-02-10T22:30:00Z", "2026-02-11T22:30:00Z", "2026-02-12T22:30:00Z"], "ts_expiration": "2026-03-27T17:00:00Z" },
+      "HGK6": { "ts_rolls": ["2026-04-08T21:30:00Z", "2026-04-09T21:30:00Z", "2026-04-10T21:30:00Z", "2026-04-13T21:30:00Z", "2026-04-14T21:30:00Z"], "ts_expiration": "2026-05-27T17:00:00Z" },
+      "HGN6": { "ts_rolls": ["2026-06-05T21:30:00Z", "2026-06-08T21:30:00Z", "2026-06-09T21:30:00Z", "2026-06-10T21:30:00Z", "2026-06-11T21:30:00Z"], "ts_expiration": "2026-07-29T17:00:00Z" },
+      "HGU6": { "ts_rolls": ["2026-08-07T21:30:00Z", "2026-08-10T21:30:00Z", "2026-08-11T21:30:00Z", "2026-08-12T21:30:00Z", "2026-08-13T21:30:00Z"], "ts_expiration": "2026-09-28T17:00:00Z" },
+      "HGZ6": { "ts_rolls": ["2026-11-06T22:30:00Z", "2026-11-09T22:30:00Z", "2026-11-10T22:30:00Z", "2026-11-11T22:30:00Z", "2026-11-12T22:30:00Z"], "ts_expiration": "2026-12-29T18:00:00Z" }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  All timestamps are UTC. Commodity roll timestamps shift between 21:30 and 22:30 UTC depending on whether US daylight saving time is in effect (17:30 ET = 21:30 UTC in summer, 22:30 UTC in winter).
+</Note>

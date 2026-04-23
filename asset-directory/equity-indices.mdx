@@ -1,0 +1,162 @@
+---
+title: 'Equity Index Perpetuals: Global Benchmarks on Trade[XYZ]'
+description: 'Reference for equity index perpetuals on Trade[XYZ]: two-source oracle design, quarterly roll schedule, and per-index coverage for six global benchmarks.'
+---
+
+Trade[XYZ] lists perpetual futures on major global equity index benchmarks. Rather than tracking a single stock, these contracts let you gain leveraged exposure to broad market movements — US tech, the S&P 500, Japanese equities, Korean equities, Chinese equities, and implied volatility — without holding the underlying basket or managing futures rolls yourself.
+
+## Listed indices
+
+| Asset | Full Name | Underlying | Exchange | Coverage |
+|-------|-----------|-----------|----------|----------|
+| XYZ100 | US Large-Cap Tech & Growth Index | Nasdaq-100 (NQ) | CME | ~23h (CME Globex) |
+| SP500 | S&P 500 Index | S&P 500 (ES) | CME | ~23h (CME Globex) |
+| JP225 | Japan 225 (Nikkei 225) | Nikkei 225 (JNK/NIY) | OSE / CME | ~21h (OSE) + ~23h (CME) |
+| KR200 | Korea 200 (KOSPI 200) | KOSPI 200 | KRX | ~19h (KRX day + night) |
+| CSI300 | China 300 (CSI 300) | CSI 300 (IF) | CFFEX / SGX | ~20h (SGX A50 proxy) |
+| VIX | CBOE Volatility Index | VIX Cash Index | Cboe | ~18.5h |
+
+## Oracle design
+
+Equity index oracles use a **two-source model**: spot index value plus discounted futures price.
+
+During regular hours, the cash index is published directly and serves as the primary oracle input. During extended sessions — when the underlying cash index is not published — Trade[XYZ] infers the spot price from active futures contracts using the cost-of-carry model:
+
+```
+S = F × e^(-(r-q)T)
+```
+
+Where `S` is the inferred spot price, `F` is the current futures price, `r` is the risk-free rate, `q` is the dividend yield, and `T` is time to expiration. This allows the oracle to remain active and well-anchored during non-cash hours without introducing a pure futures basis into the reference price.
+
+<Note>
+VIX is an exception to the two-source model. The VIX oracle uses the cash index directly — no cost-of-carry conversion is needed. See the [VIX perpetual page](/asset-directory/volatility) for details.
+</Note>
+
+## Roll schedule
+
+All equity index contracts are quarterly, expiring in March (H), June (M), September (U), and December (Z).
+
+**Roll rule**: Trade[XYZ] rolls to the next contract at **10:00 ET on the Monday before expiration week**. The roll happens during the live cash session to minimize slippage and ensure orderly transition.
+
+<Tip>
+Check the consolidated roll calendar for exact roll timestamps for each upcoming contract month. CME equity index futures settle on the third Friday of the contract month.
+</Tip>
+
+## Per-index reference
+
+<Tabs>
+  <Tab title="XYZ100">
+
+### XYZ100 — US Large-Cap Tech & Growth Index
+
+**Coin**: `xyz:XYZ100` | **Category**: indices | **Keywords**: nasdaq, qqq
+
+XYZ100 tracks a modified market-capitalization-weighted index of 100 of the largest, most actively-traded, non-financial companies listed on a US stock exchange. It serves as a benchmark for large-cap US technology and growth equities — the same index tracked by the popular QQQ ETF.
+
+**Underlying contract**: CME E-mini Nasdaq-100 (NQ)
+
+| Specification | Detail |
+|--------------|--------|
+| Contract code | NQ |
+| Exchange | CME Globex |
+| Contract unit | $20 × Nasdaq-100 Index |
+| Price quotation | Index points |
+| Minimum tick | 0.25 points = $5.00/contract |
+| Contract months | Quarterly (Mar, Jun, Sep, Dec) |
+| Settlement | Cash, against SOQ |
+| Oracle coverage | ~23h (CME Globex hours) |
+
+XYZ100 tracks the Nasdaq-100, so technology, consumer discretionary, and communication services companies dominate the index weight. Healthcare and industrials have smaller representation. Financial companies are excluded by construction.
+
+  </Tab>
+  <Tab title="SP500">
+
+### SP500 — S&P 500 Index
+
+**Coin**: `xyz:SP500` | **Category**: indices | **Keywords**: es, spx
+
+SP500 tracks the S&P 500 Index, a market-capitalization-weighted index of 500 leading publicly traded companies in the US. It is widely regarded as the best single gauge of large-cap US equities and serves as the benchmark for most institutional equity portfolios globally.
+
+**Underlying contract**: CME E-mini S&P 500 (ES)
+
+| Specification | Detail |
+|--------------|--------|
+| Contract code | ES |
+| Exchange | CME Globex |
+| Contract months | Quarterly (Mar, Jun, Sep, Dec) |
+| Settlement | Cash |
+| Oracle coverage | ~23h (CME Globex hours) |
+
+The S&P 500 is broader than the Nasdaq-100, covering all 11 GICS sectors. Technology is the largest single sector by weight, but financials, healthcare, consumer staples, and industrials all have meaningful representation.
+
+  </Tab>
+  <Tab title="JP225">
+
+### JP225 — Japan 225 (Nikkei 225)
+
+**Coin**: `xyz:JP225` | **Category**: indices | **Keywords**: japan, nikkei
+
+JP225 tracks a JPY-based, price-weighted index of 225 leading Japanese companies, serving as the primary benchmark for the Japanese equity market. Unlike most modern indices, the Nikkei 225 is price-weighted rather than market-cap-weighted — similar in construction to the Dow Jones Industrial Average.
+
+**Underlying contracts**: Nikkei 225 futures on OSE (JNK) and CME (NIY)
+
+| Specification | Detail |
+|--------------|--------|
+| Primary exchange | OSE (Osaka Exchange) |
+| CME listing | NIY (USD-denominated mini) |
+| Index currency | JPY |
+| Oracle coverage | ~21h (OSE) + ~23h (CME) |
+
+**Important**: The oracle follows the index's native JPY level without FX conversion. JP225 is quoted in index points, not USD. If the Nikkei falls from 38,000 to 37,000, your P&L reflects that 1,000-point move regardless of USD/JPY movements.
+
+  </Tab>
+  <Tab title="KR200">
+
+### KR200 — Korea 200 (KOSPI 200)
+
+**Coin**: `xyz:KR200` | **Category**: indices | **Keywords**: korea, kospi
+
+KR200 tracks a KRW-based, capitalization-weighted index of 200 large-cap South Korean companies, serving as the primary benchmark for the South Korean equity market. The KOSPI 200 covers approximately 93% of the total market capitalization of the Korea Exchange.
+
+| Specification | Detail |
+|--------------|--------|
+| Exchange | KRX (Korea Exchange) |
+| Index currency | KRW |
+| Oracle coverage | ~19h (KRX day + night sessions) |
+
+**Important**: The oracle follows the index's native KRW level without FX conversion. KR200 is quoted in index points. P&L is settled in USD based on the contract's USD denomination, but the underlying index level is tracked in KRW without a continuous FX adjustment.
+
+  </Tab>
+  <Tab title="CSI300">
+
+### CSI300 — China 300 (CSI 300)
+
+**Coin**: `xyz:CSI300` | **Category**: indices
+
+CSI300 tracks the CSI 300 Index, a capitalization-weighted index of 300 large-cap companies listed on the Shanghai Stock Exchange (SSE) and Shenzhen Stock Exchange (SZSE). It is the primary benchmark for Chinese mainland equities (A-shares).
+
+| Specification | Detail |
+|--------------|--------|
+| Primary exchange | CFFEX (China Financial Futures Exchange) |
+| Extended hours proxy | SGX A50 futures |
+| Oracle coverage | ~20h (SGX A50 proxy for extended hours) |
+
+During extended hours when CFFEX is closed, the oracle uses SGX-listed FTSE China A50 futures as a proxy to maintain pricing continuity.
+
+  </Tab>
+  <Tab title="VIX">
+
+### VIX — CBOE Volatility Index
+
+**Coin**: `xyz:VIX` | **Category**: indices
+
+VIX perpetuals reference the CBOE Volatility Index cash level — not VIX futures. See the dedicated [VIX perpetual page](/asset-directory/volatility) for full details on oracle design, trading use cases, and the rationale for referencing the cash index.
+
+| Specification | Detail |
+|--------------|--------|
+| Reference | VIX cash index (not VX futures) |
+| Published hours | ~2:15 AM–8:25 AM CT + 8:30 AM–3:15 PM CT |
+| Oracle coverage | ~18.5h on weekdays |
+
+  </Tab>
+</Tabs>

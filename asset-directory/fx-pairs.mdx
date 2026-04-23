@@ -1,0 +1,131 @@
+---
+title: 'FX Perpetuals on Trade[XYZ]: EUR/USD, USD/JPY, and DXY'
+description: 'EUR/USD, USD/JPY, and US Dollar Index (DXY) perpetuals on Trade[XYZ] — spot oracles, no-roll mechanics, DXY basket composition, and FX market context.'
+---
+
+Trade[XYZ] lists three FX perpetuals: EUR/USD (EUR), USD/JPY (JPY), and the US Dollar Index (DXY). All three reference real-time spot prices — there are no roll mechanics, expiration dates, or basis adjustments to manage. You can hold a position in any FX perpetual indefinitely.
+
+## Contracts at a glance
+
+| Symbol | Display | Tracks | CME futures |
+|--------|---------|--------|-------------|
+| **EUR** | EURUSD | EUR/USD exchange rate | 6E |
+| **JPY** | USDJPY | USD/JPY exchange rate | 6J |
+| **DXY** | DXY | USD vs. basket of 6 currencies | DX (ICE) |
+
+<Info>
+  The coin identifier format is `xyz:SYMBOL` — for example, `xyz:EUR` for EUR/USD and `xyz:DXY` for the US Dollar Index.
+</Info>
+
+---
+
+## EUR/USD (EUR)
+
+The EUR/USD pair tracks the value of the euro against the US dollar. It is consistently one of the most actively traded currency pairs in the world, accounting for a significant share of daily global FX volume. The primary interdealer venue for EUR/USD is EBS (Electronic Broking Services).
+
+The euro is the official currency of the 20 Eurozone member states. Its monetary policy is set by the European Central Bank (ECB) in Frankfurt.
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Coin** | `xyz:EUR` |
+| **Display name** | EURUSD |
+| **Keywords** | `euro`, `currency` |
+| **Tracks** | EUR/USD exchange rate |
+| **CME futures** | 6E |
+| **Oracle type** | Spot-based |
+
+---
+
+## USD/JPY (JPY)
+
+The USD/JPY pair tracks the value of the US dollar against the Japanese yen. The yen is one of the most traded currencies globally and serves as a common funding currency in carry trades. USD/JPY is closely followed as a gauge of risk appetite and relative monetary policy between the Federal Reserve and the Bank of Japan (BoJ).
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Coin** | `xyz:JPY` |
+| **Display name** | USDJPY |
+| **Keywords** | `yen`, `currency` |
+| **Tracks** | USD/JPY exchange rate |
+| **CME futures** | 6J |
+| **Oracle type** | Spot-based |
+
+---
+
+## US Dollar Index (DXY)
+
+The US Dollar Index measures the value of the US dollar against a fixed basket of six major currencies, weighted by a geometric mean. DXY was created by the US Federal Reserve in March 1973, shortly after the dismantling of the Bretton Woods system, with a base value of 100. ICE Futures U.S. (formerly NYBOT) now owns and maintains the trademark and operates the futures market.
+
+DXY futures trade 21 hours per day on the ICE platform under the symbol DX. Futures contracts were first offered for trading on November 20, 1985.
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Coin** | `xyz:DXY` |
+| **Display name** | DXY |
+| **Keywords** | `dollar`, `currency` |
+| **Tracks** | USD vs. basket of 6 major currencies |
+| **Exchange** | ICE (symbol: DX) |
+| **Base value** | 100 (established March 1973) |
+| **Oracle type** | Spot-based |
+
+### Basket composition
+
+The DXY basket composition is fixed and has changed only once since inception — in 1999, when the euro replaced five European currencies (Deutsche mark, French franc, Italian lira, Dutch guilder, and Belgian franc). The weights below reflect the current basket.
+
+| Currency | Weight |
+|----------|--------|
+| EUR | 57.6% |
+| JPY | 13.6% |
+| GBP | 11.9% |
+| CAD | 9.1% |
+| SEK | 4.2% |
+| CHF | 3.6% |
+
+### Calculation methodology
+
+DXY is calculated as a **weighted geometric mean** — not an arithmetic mean. Each currency's percentage move is raised to the power of its weight, and the results are multiplied together. This means a 1% move in EUR has a larger effect on DXY than a 1% move in SEK.
+
+<Tabs>
+  <Tab title="Geometric mean">
+    The DXY formula raises each USD/currency rate to its weight exponent and multiplies them:
+
+    ```
+    DXY = 50.14348112 × USDEUR^0.576 × USDJPY^0.136 × USDGBP^0.119
+               × USDCAD^0.091 × USDSEK^0.042 × USDCHF^0.036
+    ```
+
+    The constant `50.14348112` normalizes the result to the March 1973 base value of 100.
+  </Tab>
+  <Tab title="Arithmetic mean (not used)">
+    An arithmetic mean would simply sum each currency's weighted contribution. DXY does not use this approach — the geometric mean is less sensitive to extreme moves in individual components and is standard for trade-weighted indices.
+  </Tab>
+</Tabs>
+
+### Limitations of DXY
+
+<Warning>
+  DXY's basket is frozen from a 1973 trade-weight snapshot. It does not reflect modern global trade flows and excludes several of today's most significant trading currencies.
+</Warning>
+
+<AccordionGroup>
+  <Accordion title="EUR dominance">
+    At 57.6%, EUR is by far the largest component. In practice, DXY behaves primarily as a dollar-vs-euro index with secondary contributions from yen, pound, and the remaining currencies. A sharp EUR/USD move will drive DXY more than an equivalent move in any other pair.
+  </Accordion>
+  <Accordion title="Excluded currencies">
+    The DXY basket does not include CNY (Chinese yuan), AUD (Australian dollar), MXN (Mexican peso), or KRW (Korean won) — all of which are significant trading partners of the United States. The basket has not been updated since the 1999 euro substitution.
+  </Accordion>
+  <Accordion title="Alternatives not listed on Trade[XYZ]">
+    The US Federal Reserve maintains the **Broad Trade-Weighted Dollar Index**, which covers 26 currencies weighted by actual trade volumes and is updated regularly. Bloomberg operates the **Bloomberg Dollar Spot Index (BBDXY)**, which tracks 10 currencies and is rebalanced annually. Both are more representative of modern trade flows but are not currently listed for trading on Trade[XYZ].
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## No roll mechanics for FX
+
+FX perpetuals on Trade[XYZ] reference live spot prices continuously. Because there is no underlying futures contract to roll, you will not find FX instruments in the [Roll Calendar](/asset-directory/roll-calendar). There are no step-down transitions, no `ts_rolls` timestamps, and no `ts_expiration` values to track for EUR, JPY, or DXY.

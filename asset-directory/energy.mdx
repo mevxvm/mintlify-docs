@@ -1,0 +1,194 @@
+---
+title: 'Energy Commodity Perpetuals on Trade[XYZ]: Full Reference'
+description: 'WTI crude, Brent crude, Henry Hub, and TTF natural gas perpetuals on Trade[XYZ] — contract specs, exchange listings, benchmarks, and roll schedules.'
+---
+
+Trade[XYZ] lists four energy commodity perpetuals: WTI Crude Oil, Brent Crude Oil, Henry Hub Natural Gas, and TTF Natural Gas. Each contract references an underlying futures contract on its respective exchange and is rolled via a 5-step linear transition over business days 5–9 of the roll month at 17:30 ET. This roll methodology aligns with the S&P GSCI and Bloomberg Commodity Index (BCOM) conventions.
+
+## Contracts at a glance
+
+| Symbol | Display | Exchange | Contract code | Active months | Unit | Quoted in |
+|--------|---------|----------|---------------|---------------|------|-----------|
+| **CL** | WTIOIL | NYMEX (CME Group) | CL | All 12 | 1,000 barrels | USD/barrel |
+| **BRENTOIL** | BRENTOIL | ICE/NYMEX | BZ | All 12 | 1 barrel | USD/barrel |
+| **NATGAS** | NATGAS | NYMEX | NG | All 12 | 10,000 MMBtu | USD/MMBtu |
+| **TTF** | TTF | ICE Endex | TFM | All 12 | — | EUR/MWh |
+
+<Tip>
+  The coin identifier for each contract is `xyz:SYMBOL` — for example, `xyz:CL` for WTI Crude Oil and `xyz:NATGAS` for Henry Hub Natural Gas.
+</Tip>
+
+---
+
+## WTI Crude Oil (CL)
+
+WTI Light Sweet Crude Oil is the primary US oil benchmark. It derives its name from West Texas, where it is extracted, and its grade classification ("light sweet") from its low density and low sulfur content — properties that make it easier and cheaper to refine. WTI is priced on NYMEX and used as a reference for a large share of North American oil transactions.
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Coin** | `xyz:CL` |
+| **Display name** | WTIOIL |
+| **Keywords** | `crude`, `CL` |
+| **Underlying** | WTI Light Sweet Crude Oil, 1 barrel |
+| **Exchange** | NYMEX (CME Group) |
+| **Contract unit** | 1,000 barrels |
+| **Price quotation** | USD per barrel |
+| **Active months** | All 12 |
+
+### Roll schedule
+
+WTI rolls use a 5-step linear transition starting on business day 5 of the roll month. All timestamps are UTC. The `ts_expiration` follows the NYMEX WTI settlement rule.
+
+```json
+{
+  "CLG6": {
+    "ts_rolls": [
+      "2026-01-08T22:30:00Z",
+      "2026-01-09T22:30:00Z",
+      "2026-01-12T22:30:00Z",
+      "2026-01-13T22:30:00Z",
+      "2026-01-14T22:30:00Z"
+    ],
+    "ts_expiration": "2026-01-20T19:30:00Z"
+  },
+  "CLH6": {
+    "ts_rolls": [
+      "2026-02-06T22:30:00Z",
+      "2026-02-09T22:30:00Z",
+      "2026-02-10T22:30:00Z",
+      "2026-02-11T22:30:00Z",
+      "2026-02-12T22:30:00Z"
+    ],
+    "ts_expiration": "2026-02-20T19:30:00Z"
+  }
+}
+```
+
+<Note>
+  By business day 10 of the roll month, the position is fully allocated to the next contract. UTC offsets shift between winter (`22:30Z` = 17:30 ET) and summer (`21:30Z` = 17:30 ET) due to US daylight saving time.
+</Note>
+
+---
+
+## Brent Crude Oil (BRENTOIL)
+
+Brent Crude is the world's primary global oil benchmark, referenced in the pricing of approximately 70% of globally traded crude. It is extracted from the North Sea and is slightly heavier and sourer than WTI, but the global breadth of its physical market makes it the dominant international reference price. Brent futures trade on ICE and NYMEX.
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Coin** | `xyz:BRENTOIL` |
+| **Display name** | BRENTOIL |
+| **Keywords** | `bz`, `crude` |
+| **Underlying** | Brent Crude, 1 barrel |
+| **Exchange** | ICE / NYMEX |
+| **Active months** | All 12 |
+
+<Info>
+  Brent `ts_expiration` uses the settlement-end convention aligned with the Brent Last Day rule. See the [Roll Calendar](/asset-directory/roll-calendar) for the full 2026 Brent schedule.
+</Info>
+
+---
+
+## Natural Gas — Henry Hub (NATGAS)
+
+Henry Hub is the primary US benchmark for natural gas pricing and the physical delivery point for NYMEX natural gas futures. It is a pipeline hub in Erath, Louisiana, where nine interstate and four intrastate pipelines converge. Prices at Henry Hub are widely referenced in both domestic supply contracts and global LNG trade.
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Coin** | `xyz:NATGAS` |
+| **Display name** | NATGAS |
+| **Keywords** | `hh`, `ng` |
+| **Underlying** | Henry Hub natural gas, 1 MMBtu |
+| **Exchange** | NYMEX |
+| **Contract code** | NG |
+| **Contract unit** | 10,000 MMBtu |
+| **Price quotation** | USD per MMBtu |
+| **Min price fluctuation** | $0.001/MMBtu = $10.00/contract |
+| **Active months** | All 12 |
+| **Trading termination** | 3rd-to-last business day of month prior to contract month |
+
+### Roll schedule
+
+Henry Hub rolls follow the same 5-step structure as WTI. All timestamps are UTC.
+
+```json
+{
+  "NGG6": {
+    "ts_rolls": [
+      "2026-01-08T22:30:00Z",
+      "2026-01-09T22:30:00Z",
+      "2026-01-12T22:30:00Z",
+      "2026-01-13T22:30:00Z",
+      "2026-01-14T22:30:00Z"
+    ],
+    "ts_expiration": "2026-01-28T19:30:00Z"
+  },
+  "NGH6": {
+    "ts_rolls": [
+      "2026-02-06T22:30:00Z",
+      "2026-02-09T22:30:00Z",
+      "2026-02-10T22:30:00Z",
+      "2026-02-11T22:30:00Z",
+      "2026-02-12T22:30:00Z"
+    ],
+    "ts_expiration": "2026-02-25T19:30:00Z"
+  }
+}
+```
+
+---
+
+## TTF Natural Gas (TTF)
+
+TTF (Title Transfer Facility) is the primary European natural gas benchmark, operating as a virtual trading hub in the Netherlands. TTF prices are quoted in EUR per MWh and are used as the reference price for European gas supply contracts, LNG imports, and energy policy. TTF futures trade on ICE Endex under the contract code TFM.
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Display name** | TTF |
+| **Exchange** | ICE Endex |
+| **Contract code** | TFM |
+| **Price quotation** | EUR per MWh |
+| **Active months** | All 12 |
+
+<Note>
+  TTF prices are denominated in EUR/MWh, while WTI and Brent are denominated in USD/barrel. The unit difference reflects the distinct market conventions of European versus North American energy markets.
+</Note>
+
+---
+
+## Roll mechanics
+
+All four energy contracts follow the same roll structure. Trade[XYZ] uses a **5-step linear transition** — each step shifts 20% of the open position from the expiring contract to the incoming contract.
+
+<AccordionGroup>
+  <Accordion title="Roll timing">
+    Rolls execute at **17:30 ET** on business days 5, 6, 7, 8, and 9 of the roll month. By the open of business day 10, the position is 100% in the next contract.
+  </Accordion>
+  <Accordion title="Index methodology alignment">
+    This schedule aligns with the S&P GSCI and Bloomberg Commodity Index (BCOM) roll methodology, both of which transition commodity exposure during business days 5–9 of the roll month.
+  </Accordion>
+  <Accordion title="Timestamp conventions">
+    All `ts_rolls` and `ts_expiration` values in the roll calendar are expressed in UTC. Winter rolls appear at `22:30Z` (= 17:30 ET) and summer rolls at `21:30Z` (= 17:30 ET) due to US daylight saving time.
+  </Accordion>
+  <Accordion title="Active contract calendar">
+    | Month | Jan | Feb | Mar | Apr | May | Jun | Jul | Aug | Sep | Oct | Nov | Dec |
+    |-------|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
+    | **CL** | G | H | J | K | M | N | Q | U | V | X | Z | F+1 |
+    | **BRENT** | H | J | K | M | N | Q | U | V | X | Z | F+1 | G+1 |
+    | **NG** | G | H | J | K | M | N | Q | U | V | X | Z | F+1 |
+
+    Standard CME month codes: F=Jan, G=Feb, H=Mar, J=Apr, K=May, M=Jun, N=Jul, Q=Aug, U=Sep, V=Oct, X=Nov, Z=Dec.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  For the complete roll schedule across all commodity contracts and equity indices, see the [Roll Calendar](/asset-directory/roll-calendar).
+</Tip>

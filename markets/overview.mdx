@@ -1,0 +1,51 @@
+---
+title: "Markets Overview: What You Can Trade on Trade[XYZ]"
+description: "Trade[XYZ] lists perpetual futures across four asset classes — stocks, indices, commodities, and FX — available around the clock."
+---
+
+Trade[XYZ] offers perpetual futures on traditional financial assets across four categories. Every market references real-time prices through a transparent, multi-source oracle, so you always know what drives the price you're trading. There are no expiries to manage — positions stay open until you close them or funding adjusts your cost of carry.
+
+<CardGroup cols={2}>
+  <Card title="Stocks" icon="chart-line" href="/markets/stocks">
+    Perpetual futures on individual equities from US exchanges (NYSE, NASDAQ) and international markets including Korea, Japan, and China. Stock perps reference real-time spot prices with no roll mechanics.
+  </Card>
+  <Card title="Indices" icon="layer-group" href="/markets/indices">
+    Perpetual futures on major equity benchmarks — XYZ100, SP500, JP225, KR200, CSI300, and VIX. Index perps roll quarterly and use a two-source oracle combining the spot index with discounted futures.
+  </Card>
+  <Card title="Commodities" icon="fire" href="/markets/commodities">
+    Perpetual futures on energy, precious metals, and base metals. Each commodity perp references an underlying futures contract and rolls via a 5-step linear transition on business days 5–9 of the roll month.
+  </Card>
+  <Card title="FX" icon="coins" href="/markets/fx">
+    Perpetual futures on currency pairs and the US Dollar Index. FX perps reference real-time spot prices. The DXY contract tracks a basket of six major currencies weighted by a geometric mean.
+  </Card>
+</CardGroup>
+
+## Asset categories at a glance
+
+| Category | Markets | Price source | Roll mechanism |
+|---|---|---|---|
+| [Stocks](/markets/stocks) | US, Korea, Japan, China equities | Real-time spot | None |
+| [Indices](/markets/indices) | XYZ100, SP500, JP225, KR200, CSI300, VIX | Spot index + discounted futures | Quarterly (Mar/Jun/Sep/Dec) |
+| [Commodities](/markets/commodities) | Energy, precious metals, base metals | Underlying futures | 5-step linear, days 5–9 of roll month |
+| [FX](/markets/fx) | EURUSD, USDJPY, DXY | Real-time spot | None |
+
+## Roll calendar
+
+Assets that reference traditional futures contracts must be rolled before expiration. Two roll mechanisms are in use across the platform:
+
+**Equity index roll** — Contracts roll instantaneously at 10:00 ET on the Monday before expiration week. Because prices are converted to spot via the cost-of-carry model before and after the roll, the spread between the outgoing and incoming contracts is negligible.
+
+**Commodity roll** — Contracts transition over business days 5–9 of the roll month at 17:30 ET, using a 5-step linear weighting. This graduated approach minimises price deviation between the outgoing and incoming contracts, consistent with S&P GSCI and Bloomberg Commodity Index methodology.
+
+<Note>
+  Stock and FX perpetuals have no roll mechanics — they reference real-time spot prices directly, so there is no contract expiry to manage.
+</Note>
+
+## International equities
+
+Foreign stocks listed on Trade[XYZ] are **composite** instruments. The oracle prices each foreign share in its native currency, then converts to USD at the prevailing FX rate:
+
+- Korean stocks (KRX/Nextrade ATS): KRW → USD
+- Japanese stocks (TSE/Japanext PTS): JPY → USD
+
+This means your PnL on Samsung (SMSN) or SoftBank (SOFTBANK) reflects both the share price move and any USD/KRW or USD/JPY move over the same period.

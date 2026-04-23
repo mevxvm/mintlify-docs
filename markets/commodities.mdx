@@ -1,0 +1,83 @@
+---
+title: "Commodity Perpetuals: Energy, Metals, and More"
+description: "Trade perpetual futures on WTI, Brent, natural gas, gold, silver, copper, and more — with a 5-step roll that minimises contract transition cost."
+---
+
+Trade[XYZ] lists perpetual futures on commodity assets across three sectors: energy, precious metals, and base metals. Each commodity perp references an underlying exchange-traded futures contract. Because futures contracts expire, Trade[XYZ] uses a 5-step linear roll transition to move from the outgoing contract to the incoming one smoothly — minimising price impact and aligning with established commodity index methodology.
+
+## Listed commodity markets
+
+<Tabs>
+  <Tab title="Energy">
+    | Market | Display name | Underlying code | Exchange | Active months |
+    |---|---|---|---|---|
+    | WTI Crude Oil | WTIOIL | CL | NYMEX | All 12 |
+    | Brent Crude Oil | BRENTOIL | BZ | ICE / NYMEX | All 12 |
+    | Natural Gas (Henry Hub) | NATGAS | NG | NYMEX | All 12 |
+    | TTF Natural Gas | TTF | TFM | ICE Endex | All 12 |
+
+    **WTI Crude (CL/NYMEX)** — West Texas Intermediate Light Sweet Crude Oil, priced per barrel. WTI is a primary global oil benchmark due to its low density and low sulphur content.
+
+    **Brent Crude (BZ/ICE-NYMEX)** — Brent Crude Oil, priced per barrel. Brent is the world's primary oil benchmark, pricing approximately 70% of globally traded crude and reflecting global seaborne oil market fundamentals.
+
+    **Natural Gas / Henry Hub (NG/NYMEX)** — Henry Hub natural gas, priced per MMBtu. Henry Hub is the primary US benchmark for natural gas pricing, widely referenced in global energy markets.
+
+    **TTF Natural Gas (TFM/ICE Endex)** — Title Transfer Facility natural gas, the primary European benchmark for natural gas pricing.
+  </Tab>
+  <Tab title="Precious metals">
+    | Market | Display name | Spot symbol | Futures exchange | Unit |
+    |---|---|---|---|---|
+    | Gold | GOLD | XAU | COMEX (GC) | Per troy oz |
+    | Silver | SILVER | XAG | COMEX (SI) | Per troy oz |
+    | Platinum | PLATINUM | XPT | NYMEX (PL) | Per troy oz |
+    | Palladium | PALLADIUM | XPD | NYMEX (PA) | Per troy oz |
+
+    **Gold (XAU/COMEX GC)** — Gold is a globally traded precious metal widely used as a store of value, an inflation hedge, and a central bank reserve asset.
+
+    **Silver (XAG/COMEX SI)** — Silver is both a precious and industrial metal with demand across investment markets, electronics, solar energy, and jewellery.
+
+    **Platinum (XPT/NYMEX PL)** — Platinum is a precious metal with major demand from automotive catalysts, jewellery, and industrial applications.
+
+    **Palladium (XPD/NYMEX PA)** — Palladium is a precious metal primarily used in automotive catalytic converters and is a key input in emissions-control systems.
+  </Tab>
+  <Tab title="Base metals">
+    | Market | Display name | Futures code | Exchange | Unit | Active months |
+    |---|---|---|---|---|---|
+    | Copper | COPPER | HG | COMEX | Per pound | H, K, N, U, Z |
+    | Aluminium | ALUMINIUM | ALI | COMEX | Per metric ton | All 12 |
+
+    **Copper (HG/COMEX)** — Copper is a core industrial metal and a widely followed barometer of global manufacturing and infrastructure demand.
+
+    **Aluminium (ALI/COMEX)** — Aluminium is a lightweight industrial metal widely used in transportation, construction, packaging, and power infrastructure.
+  </Tab>
+</Tabs>
+
+## Roll mechanism
+
+Commodity perps must be rolled as the underlying futures contract approaches expiration. Trade[XYZ] uses a **5-step linear transition** over business days 5–9 of the roll month, executed at **17:30 ET** each day.
+
+| Business day | Outgoing contract weight | Incoming contract weight |
+|---|---|---|
+| Day 5 | 80% | 20% |
+| Day 6 | 60% | 40% |
+| Day 7 | 40% | 60% |
+| Day 8 | 20% | 80% |
+| Day 9 | 0% | 100% |
+
+The new contract weight distribution takes effect at the open of the next trading session after each daily step. This graduated approach minimises the price deviation between contracts and aligns with the methodology used by the S&P GSCI and Bloomberg Commodity Index (BCOM).
+
+<Note>
+  You do not need to manually roll your position. Trade[XYZ] handles the roll automatically. The linear transition reduces the basis impact you would otherwise experience from a single instantaneous roll.
+</Note>
+
+<Tip>
+  For full roll schedules including exact roll month dates for each commodity, see the [Roll Calendar](/asset-directory/roll-calendar).
+</Tip>
+
+## Price sources
+
+Precious metals (Gold, Silver, Platinum, Palladium) use a spot-based oracle — prices are derived from real-time spot metal prices rather than the front-month futures contract alone. Energy and base metal perps use the underlying futures contract price, transitioned smoothly across roll periods.
+
+<Info>
+  Commodity perp prices are denominated in USD. WTI and Brent are priced per barrel; Henry Hub and TTF per MMBtu; Gold, Silver, Platinum, and Palladium per troy ounce; Copper per pound; and Aluminium per metric ton.
+</Info>

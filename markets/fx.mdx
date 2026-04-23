@@ -1,0 +1,73 @@
+---
+title: "FX Perpetuals: Currency Pairs and the Dollar Index"
+description: "Trade perpetual futures on EURUSD, USDJPY, and DXY — spot-referenced FX markets with no rolls and continuous pricing around the clock."
+---
+
+Trade[XYZ] lists perpetual futures on foreign exchange pairs and the US Dollar Index. FX perps reference real-time spot prices, so there are no roll mechanics, no expiry dates, and no futures basis to manage. You get continuous, spot-referenced exposure to currency markets.
+
+## Listed FX markets
+
+<CardGroup cols={3}>
+  <Card title="EURUSD" icon="euro-sign">
+    Euro / US Dollar exchange rate. The euro is the official currency of the Eurozone and one of the most actively traded currencies in global FX markets.
+  </Card>
+  <Card title="USDJPY" icon="yen-sign">
+    US Dollar / Japanese Yen exchange rate. The yen is the official currency of Japan and among the most actively traded currencies in global FX markets.
+  </Card>
+  <Card title="DXY" icon="dollar-sign">
+    US Dollar Index — a geometric basket measuring the value of the US dollar against six major foreign currencies.
+  </Card>
+</CardGroup>
+
+| Market | Description | Price source | Roll |
+|---|---|---|---|
+| EURUSD | Euro / US Dollar | Real-time spot | None |
+| USDJPY | US Dollar / Japanese Yen | Real-time spot | None |
+| DXY | US Dollar Index (6-currency basket) | Real-time spot / ICE DX futures | None |
+
+## DXY: the US Dollar Index
+
+The DXY (US Dollar Index) measures the value of the US dollar against a basket of six major currencies. Rather than a simple arithmetic average, DXY uses a **weighted geometric mean** — meaning the index level is the product of each currency's exchange rate raised to the power of its weight.
+
+### Basket composition
+
+| Currency | Weight |
+|---|---|
+| Euro (EUR) | 57.6% |
+| Japanese Yen (JPY) | 13.6% |
+| British Pound (GBP) | 11.9% |
+| Canadian Dollar (CAD) | 9.1% |
+| Swedish Krona (SEK) | 4.2% |
+| Swiss Franc (CHF) | 3.6% |
+
+<Info>
+  The DXY basket weights have been fixed since the index was created in 1973, with one adjustment made in 1999 to incorporate the euro when it replaced several constituent European currencies (the Deutsche Mark, French franc, Italian lira, Dutch guilder, Belgian franc, and Spanish peseta).
+</Info>
+
+### DXY futures
+
+DXY futures trade under the symbol **DX** on ICE (Intercontinental Exchange), with approximately **21 hours of daily trading coverage**. The Trade[XYZ] DXY perp references real-time spot pricing derived from this market.
+
+<Note>
+  Because DXY uses a geometric mean, a 1% rise in each constituent currency does not produce exactly a 1% rise in the index — the geometric aggregation means large moves in individual currencies have a dampened effect on the overall index level.
+</Note>
+
+## How FX perp prices are determined
+
+All FX perps on Trade[XYZ] reference real-time spot prices:
+
+- **EURUSD** and **USDJPY** are sourced directly from global spot FX feeds, which operate continuously 24 hours a day, five days a week (with reduced liquidity over weekends).
+- **DXY** is derived from the constituent spot rates of the six basket currencies, using ICE DX futures as an additional reference source during high-activity periods.
+
+<Tip>
+  FX perps are useful beyond directional currency trading. Because foreign equity composites on Trade[XYZ] convert KRW and JPY prices to USD in real time, you can use USDJPY or EURUSD perps to hedge the FX component of a Korean or Japanese stock position.
+</Tip>
+
+## FX and international equity composites
+
+Foreign equity perps on Trade[XYZ] embed a live FX conversion. For example:
+
+- **SMSN (Samsung)** — priced in KRW, converted to USD at the real-time USD/KRW spot rate
+- **SOFTBANK** — priced in JPY, converted to USD at the real-time USD/JPY spot rate
+
+If you hold a long SOFTBANK position and USD/JPY rises (the yen weakens), the USD value of your position falls even if the JPY share price is unchanged. You can hedge this exposure by holding a corresponding USDJPY position on Trade[XYZ].

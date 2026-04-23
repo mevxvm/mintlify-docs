@@ -1,0 +1,98 @@
+---
+title: "Equity Index Perpetuals: Global Benchmark Markets"
+description: "Trade perpetual futures on XYZ100, SP500, JP225, KR200, CSI300, and VIX — up to 23 hours of daily coverage, two-source oracle design, and quarterly rolls."
+---
+
+Trade[XYZ] lists perpetual futures on six major equity index benchmarks, giving you continuous exposure to broad market performance across the US, Japan, Korea, China, and volatility markets. Index perps use a two-source oracle — combining the live spot index value with discounted futures prices — so pricing stays accurate even during extended sessions when the underlying exchange is closed.
+
+## Listed index markets
+
+| Market | Underlying index | Futures exchange | Daily coverage |
+|---|---|---|---|
+| XYZ100 | Nasdaq-100 (NQ) | CME | ~23 hours |
+| SP500 | S&P 500 (ES) | CME | ~23 hours |
+| JP225 | Nikkei 225 (JNK/NIY) | OSE / CME | ~21–23 hours |
+| KR200 | KOSPI 200 | KRX | ~19 hours |
+| CSI300 | CSI 300 (IF) | CFFEX / SGX | ~20 hours |
+| VIX | Cboe Volatility Index | Cboe | ~18.5 hours |
+
+<Tabs>
+  <Tab title="XYZ100">
+    **XYZ100** tracks a modified market-capitalisation-weighted index of 100 of the largest, most actively traded non-financial companies listed on a US stock exchange. It serves as the primary benchmark for large-cap US technology and growth equities.
+
+    - **Underlying futures**: NQ (E-mini Nasdaq-100) on CME Globex
+    - **Coverage**: ~23 hours/day via CME Globex
+    - **Roll cycle**: Quarterly — March, June, September, December
+    - **Keywords**: nasdaq, qqq
+  </Tab>
+  <Tab title="SP500">
+    **SP500** tracks the S&P 500, a market-capitalisation-weighted index of 500 leading publicly traded US companies, widely regarded as the primary gauge of large-cap US equities.
+
+    - **Underlying futures**: ES (E-mini S&P 500) on CME Globex
+    - **Coverage**: ~23 hours/day via CME Globex
+    - **Roll cycle**: Quarterly — March, June, September, December
+    - **Keywords**: es, spx
+  </Tab>
+  <Tab title="JP225">
+    **JP225** tracks the Nikkei 225, a JPY-denominated, price-weighted index of 225 leading Japanese companies. It is the primary benchmark for the Japanese equity market. The oracle follows the index's native JPY level without FX conversion.
+
+    - **Underlying futures**: JNK/NIY (Nikkei 225) on OSE and CME
+    - **Coverage**: ~21 hours (OSE session) up to ~23 hours (CME session)
+    - **Roll cycle**: Quarterly — March, June, September, December
+    - **Keywords**: japan, nikkei
+  </Tab>
+  <Tab title="KR200">
+    **KR200** tracks the KOSPI 200, a KRW-denominated, capitalisation-weighted index of 200 large-cap South Korean companies. It is the primary benchmark for the South Korean equity market. The oracle follows the index's native KRW level without FX conversion.
+
+    - **Underlying futures**: KOSPI 200 futures on KRX
+    - **Coverage**: ~19 hours/day (KRX day + night sessions)
+    - **Roll cycle**: Quarterly — March, June, September, December
+    - **Keywords**: korea, kospi
+  </Tab>
+  <Tab title="CSI300">
+    **CSI300** tracks the CSI 300, a capitalisation-weighted index of 300 large-cap A-share companies listed on the Shanghai and Shenzhen stock exchanges. The oracle uses SGX A50 futures as a proxy during extended sessions.
+
+    - **Underlying futures**: IF (CSI 300 futures) on CFFEX; SGX A50 as extended-hours proxy
+    - **Coverage**: ~20 hours/day
+    - **Roll cycle**: Quarterly — March, June, September, December
+  </Tab>
+  <Tab title="VIX">
+    **VIX** tracks the Cboe Volatility Index, which measures the market's expectation of 30-day S&P 500 volatility implied by options prices. VIX perps give you direct exposure to equity market volatility without having to trade options.
+
+    - **Underlying**: Cboe VIX Cash Index
+    - **Coverage**: ~18.5 hours/day (Cboe calculation hours)
+    - **Roll cycle**: Quarterly — March, June, September, December
+  </Tab>
+</Tabs>
+
+## Roll mechanics
+
+All equity index contracts are **quarterly**, expiring in March, June, September, and December. Rolls happen instantaneously at **10:00 ET on the Monday before expiration week**.
+
+Because the oracle converts futures prices to spot via the cost-of-carry model before and after the roll, the spread between the outgoing and incoming contract is negligible. You experience no price gap at the roll.
+
+<Note>
+  You do not need to take any action at roll time. Trade[XYZ] handles the transition automatically, and your open position continues without interruption.
+</Note>
+
+## Oracle methodology: two-source design
+
+Equity index perps use a two-source oracle:
+
+1. **Spot index** — the live published level of the underlying index during exchange hours.
+2. **Discounted futures** — when the spot index is unavailable (outside exchange hours), the oracle infers the spot price from the current futures price using the cost-of-carry model:
+
+$$S = F \cdot e^{-(r-q)T}$$
+
+Where:
+- `S` is the implied spot index level
+- `F` is the current futures price
+- `r` is the risk-free rate
+- `q` is the dividend yield
+- `T` is time to futures expiration (in years)
+
+This design ensures continuous, economically grounded pricing during extended sessions — even when the underlying exchange is closed.
+
+<Info>
+  JP225 and KR200 are priced in their native currencies (JPY and KRW respectively) without FX conversion. Your margin and PnL on these markets are settled in USD, using the oracle's published index level directly.
+</Info>

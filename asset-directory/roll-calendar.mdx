@@ -1,0 +1,579 @@
+---
+title: "Consolidated Roll Calendar for All Trade[XYZ] Assets"
+description: "Roll schedules for Trade[XYZ] assets that reference expiring futures contracts — equity indices, energy, and base metals — with 2026 UTC timestamps."
+---
+
+Assets on TradeXYZ that reference traditional futures contracts must roll from an expiring contract to the next active one before final settlement. This page documents the roll rule for each asset class, the active contract calendar showing which contract month is live in any given calendar month, and the exact 2026 roll and expiration timestamps for equity indices and key commodity markets. All timestamps on this page are **UTC**.
+
+<Note>
+  **Equity index rolls** are instantaneous — futures prices are converted to spot via a cost-of-carry model so the spread between contracts is negligible at roll time. **Commodity rolls** are multi-stage to mitigate price deviation between contracts.
+</Note>
+
+---
+
+## Roll rule methods
+
+<Tabs>
+  <Tab title="Equity indices">
+
+Equity index perpetuals roll at **10:00 ET (14:00 UTC / 15:00 UTC during DST)** on the **Monday before expiration week**.
+
+- `ts_roll` — the exact UTC timestamp at which TradeXYZ switches the active contract.
+- `ts_expiration` — the final settlement timestamp for the expiring contract as set by the underlying exchange.
+
+The roll is instantaneous: there is no multi-step transition and no user action is required.
+
+  </Tab>
+  <Tab title="Commodities">
+
+Commodity perpetuals roll over **five business days**, specifically **business days 5–9** of the roll month, at **17:30 ET (21:30 UTC / 22:30 UTC during EST)** each day.
+
+- `ts_rolls` — array of five UTC timestamps, one per roll business day (BD5 through BD9).
+- `ts_expiration` — final settlement timestamp from the underlying exchange rule (NYMEX, ICE, CME).
+- **BD10** — by the tenth business day the position is fully in the next contract.
+
+This five-step linear transition aligns with S&P GSCI and BCOM roll methodology and minimizes slippage from price differences between front and back contracts.
+
+  </Tab>
+</Tabs>
+
+---
+
+## Active contract calendar
+
+The table below shows which futures contract month is the active front contract for each calendar month. Month codes follow the standard CME/ICE convention.
+
+| Asset | Jan | Feb | Mar | Apr | May | Jun | Jul | Aug | Sep | Oct | Nov | Dec |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Month codes** | F | G | H | J | K | M | N | Q | U | V | X | Z |
+| **XYZ100** | H | H | H | M | M | M | U | U | U | Z | Z | Z |
+| **SP500** | H | H | H | M | M | M | U | U | U | Z | Z | Z |
+| **CL** | G | H | J | K | M | N | Q | U | V | X | Z | F+1 |
+| **BRENT** | H | J | K | M | N | Q | U | V | X | Z | F+1 | G+1 |
+| **NG** | G | H | J | K | M | N | Q | U | V | X | Z | F+1 |
+| **HG** | H | H | K | K | N | N | U | U | Z | Z | Z | H+1 |
+
+**Month code key**
+
+| Code | Month | Code | Month | Code | Month |
+|---|---|---|---|---|---|
+| F | January | G | February | H | March |
+| J | April | K | May | M | June |
+| N | July | Q | August | U | September |
+| V | October | X | November | Z | December |
+
+`+1` denotes the same contract month in the following calendar year (e.g., `F+1` in December means the January contract of the next year).
+
+<Tip>
+  Copper (HG) trades only the five active months **H / K / N / U / Z**. It does not roll monthly — the January and February calendar months both hold the March (H) contract.
+</Tip>
+
+---
+
+## Equity index roll schedules — 2026
+
+### XYZ100 (NQ)
+
+XYZ100 tracks the Nasdaq-100 via the CME E-mini NQ futures contract. It rolls on the Monday before expiration week at 10:00 ET. For December the roll is at 15:00 UTC (10:00 EST, no DST).
+
+```json
+{
+  "NQH6": {
+    "ts_roll": "2026-03-16T14:00:00Z",
+    "ts_expiration": "2026-03-20T13:30:00Z"
+  },
+  "NQM6": {
+    "ts_roll": "2026-06-15T14:00:00Z",
+    "ts_expiration": "2026-06-18T13:30:00Z"
+  },
+  "NQU6": {
+    "ts_roll": "2026-09-14T14:00:00Z",
+    "ts_expiration": "2026-09-18T13:30:00Z"
+  },
+  "NQZ6": {
+    "ts_roll": "2026-12-14T15:00:00Z",
+    "ts_expiration": "2026-12-18T14:30:00Z"
+  }
+}
+```
+
+### SP500 (ES)
+
+SP500 tracks the S&P 500 via the CME E-mini ES futures contract and follows the same Monday-before-expiry-week rule as XYZ100.
+
+```json
+{
+  "ESH6": {
+    "ts_roll": "2026-03-16T14:00:00Z",
+    "ts_expiration": "2026-03-20T13:30:00Z"
+  },
+  "ESM6": {
+    "ts_roll": "2026-06-15T14:00:00Z",
+    "ts_expiration": "2026-06-18T13:30:00Z"
+  },
+  "ESU6": {
+    "ts_roll": "2026-09-14T14:00:00Z",
+    "ts_expiration": "2026-09-18T13:30:00Z"
+  },
+  "ESZ6": {
+    "ts_roll": "2026-12-14T15:00:00Z",
+    "ts_expiration": "2026-12-18T14:30:00Z"
+  }
+}
+```
+
+---
+
+## Commodity roll schedules — 2026
+
+Commodity `ts_expiration` values follow the rules of the underlying exchange. All roll timestamps in the arrays below are UTC.
+
+### WTI Crude Oil (CL)
+
+CL rolls monthly. `ts_expiration` follows the NYMEX WTI last trading day rule. The full 2026 schedule is shown below.
+
+```json
+{
+  "CLG6": {
+    "ts_rolls": [
+      "2026-01-08T22:30:00Z",
+      "2026-01-09T22:30:00Z",
+      "2026-01-12T22:30:00Z",
+      "2026-01-13T22:30:00Z",
+      "2026-01-14T22:30:00Z"
+    ],
+    "ts_expiration": "2026-01-20T19:30:00Z"
+  },
+  "CLH6": {
+    "ts_rolls": [
+      "2026-02-06T22:30:00Z",
+      "2026-02-09T22:30:00Z",
+      "2026-02-10T22:30:00Z",
+      "2026-02-11T22:30:00Z",
+      "2026-02-12T22:30:00Z"
+    ],
+    "ts_expiration": "2026-02-20T19:30:00Z"
+  },
+  "CLJ6": {
+    "ts_rolls": [
+      "2026-03-06T22:30:00Z",
+      "2026-03-09T21:30:00Z",
+      "2026-03-10T21:30:00Z",
+      "2026-03-11T21:30:00Z",
+      "2026-03-12T21:30:00Z"
+    ],
+    "ts_expiration": "2026-03-20T18:30:00Z"
+  },
+  "CLK6": {
+    "ts_rolls": [
+      "2026-04-08T21:30:00Z",
+      "2026-04-09T21:30:00Z",
+      "2026-04-10T21:30:00Z",
+      "2026-04-13T21:30:00Z",
+      "2026-04-14T21:30:00Z"
+    ],
+    "ts_expiration": "2026-04-21T18:30:00Z"
+  },
+  "CLM6": {
+    "ts_rolls": [
+      "2026-05-07T21:30:00Z",
+      "2026-05-08T21:30:00Z",
+      "2026-05-11T21:30:00Z",
+      "2026-05-12T21:30:00Z",
+      "2026-05-13T21:30:00Z"
+    ],
+    "ts_expiration": "2026-05-19T18:30:00Z"
+  },
+  "CLN6": {
+    "ts_rolls": [
+      "2026-06-05T21:30:00Z",
+      "2026-06-08T21:30:00Z",
+      "2026-06-09T21:30:00Z",
+      "2026-06-10T21:30:00Z",
+      "2026-06-11T21:30:00Z"
+    ],
+    "ts_expiration": "2026-06-22T18:30:00Z"
+  },
+  "CLQ6": {
+    "ts_rolls": [
+      "2026-07-08T21:30:00Z",
+      "2026-07-09T21:30:00Z",
+      "2026-07-10T21:30:00Z",
+      "2026-07-13T21:30:00Z",
+      "2026-07-14T21:30:00Z"
+    ],
+    "ts_expiration": "2026-07-21T18:30:00Z"
+  },
+  "CLU6": {
+    "ts_rolls": [
+      "2026-08-07T21:30:00Z",
+      "2026-08-10T21:30:00Z",
+      "2026-08-11T21:30:00Z",
+      "2026-08-12T21:30:00Z",
+      "2026-08-13T21:30:00Z"
+    ],
+    "ts_expiration": "2026-08-20T18:30:00Z"
+  },
+  "CLV6": {
+    "ts_rolls": [
+      "2026-09-08T21:30:00Z",
+      "2026-09-09T21:30:00Z",
+      "2026-09-10T21:30:00Z",
+      "2026-09-11T21:30:00Z",
+      "2026-09-14T21:30:00Z"
+    ],
+    "ts_expiration": "2026-09-22T18:30:00Z"
+  },
+  "CLX6": {
+    "ts_rolls": [
+      "2026-10-07T21:30:00Z",
+      "2026-10-08T21:30:00Z",
+      "2026-10-09T21:30:00Z",
+      "2026-10-12T21:30:00Z",
+      "2026-10-13T21:30:00Z"
+    ],
+    "ts_expiration": "2026-10-20T18:30:00Z"
+  },
+  "CLZ6": {
+    "ts_rolls": [
+      "2026-11-06T22:30:00Z",
+      "2026-11-09T22:30:00Z",
+      "2026-11-10T22:30:00Z",
+      "2026-11-11T22:30:00Z",
+      "2026-11-12T22:30:00Z"
+    ],
+    "ts_expiration": "2026-11-20T19:30:00Z"
+  },
+  "CLF7": {
+    "ts_rolls": [
+      "2026-12-07T22:30:00Z",
+      "2026-12-08T22:30:00Z",
+      "2026-12-09T22:30:00Z",
+      "2026-12-10T22:30:00Z",
+      "2026-12-11T22:30:00Z"
+    ],
+    "ts_expiration": "2026-12-21T19:30:00Z"
+  }
+}
+```
+
+### Brent Crude Oil (BRENTOIL / BZ)
+
+BRENTOIL rolls monthly. `ts_expiration` uses the **settlement-end convention** based on the ICE Brent last day rule.
+
+<Note>
+  Brent `ts_expiration` timestamps use the settlement-end convention. If you need to anchor Brent to a different clock convention, adjust only the timestamp value — the calendar date does not change.
+</Note>
+
+```json
+{
+  "BZH6": {
+    "ts_rolls": [
+      "2026-01-08T22:30:00Z",
+      "2026-01-09T22:30:00Z",
+      "2026-01-12T22:30:00Z",
+      "2026-01-13T22:30:00Z",
+      "2026-01-14T22:30:00Z"
+    ],
+    "ts_expiration": "2026-01-30T18:30:00Z"
+  },
+  "BZJ6": {
+    "ts_rolls": [
+      "2026-02-06T22:30:00Z",
+      "2026-02-09T22:30:00Z",
+      "2026-02-10T22:30:00Z",
+      "2026-02-11T22:30:00Z",
+      "2026-02-12T22:30:00Z"
+    ],
+    "ts_expiration": "2026-02-27T18:30:00Z"
+  },
+  "BZK6": {
+    "ts_rolls": [
+      "2026-03-06T22:30:00Z",
+      "2026-03-09T21:30:00Z",
+      "2026-03-10T21:30:00Z",
+      "2026-03-11T21:30:00Z",
+      "2026-03-12T21:30:00Z"
+    ],
+    "ts_expiration": "2026-03-31T18:30:00Z"
+  },
+  "BZM6": {
+    "ts_rolls": [
+      "2026-04-08T21:30:00Z",
+      "2026-04-09T21:30:00Z",
+      "2026-04-10T21:30:00Z",
+      "2026-04-13T21:30:00Z",
+      "2026-04-14T21:30:00Z"
+    ],
+    "ts_expiration": "2026-04-30T18:30:00Z"
+  },
+  "BZN6": {
+    "ts_rolls": [
+      "2026-05-07T21:30:00Z",
+      "2026-05-08T21:30:00Z",
+      "2026-05-11T21:30:00Z",
+      "2026-05-12T21:30:00Z",
+      "2026-05-13T21:30:00Z"
+    ],
+    "ts_expiration": "2026-05-29T18:30:00Z"
+  },
+  "BZQ6": {
+    "ts_rolls": [
+      "2026-06-05T21:30:00Z",
+      "2026-06-08T21:30:00Z",
+      "2026-06-09T21:30:00Z",
+      "2026-06-10T21:30:00Z",
+      "2026-06-11T21:30:00Z"
+    ],
+    "ts_expiration": "2026-06-30T18:30:00Z"
+  },
+  "BZU6": {
+    "ts_rolls": [
+      "2026-07-08T21:30:00Z",
+      "2026-07-09T21:30:00Z",
+      "2026-07-10T21:30:00Z",
+      "2026-07-13T21:30:00Z",
+      "2026-07-14T21:30:00Z"
+    ],
+    "ts_expiration": "2026-07-31T18:30:00Z"
+  },
+  "BZV6": {
+    "ts_rolls": [
+      "2026-08-07T21:30:00Z",
+      "2026-08-10T21:30:00Z",
+      "2026-08-11T21:30:00Z",
+      "2026-08-12T21:30:00Z",
+      "2026-08-13T21:30:00Z"
+    ],
+    "ts_expiration": "2026-08-28T18:30:00Z"
+  },
+  "BZX6": {
+    "ts_rolls": [
+      "2026-09-08T21:30:00Z",
+      "2026-09-09T21:30:00Z",
+      "2026-09-10T21:30:00Z",
+      "2026-09-11T21:30:00Z",
+      "2026-09-14T21:30:00Z"
+    ],
+    "ts_expiration": "2026-09-30T18:30:00Z"
+  },
+  "BZZ6": {
+    "ts_rolls": [
+      "2026-10-07T21:30:00Z",
+      "2026-10-08T21:30:00Z",
+      "2026-10-09T21:30:00Z",
+      "2026-10-12T21:30:00Z",
+      "2026-10-13T21:30:00Z"
+    ],
+    "ts_expiration": "2026-10-30T18:30:00Z"
+  },
+  "BZF7": {
+    "ts_rolls": [
+      "2026-11-06T22:30:00Z",
+      "2026-11-09T22:30:00Z",
+      "2026-11-10T22:30:00Z",
+      "2026-11-11T22:30:00Z",
+      "2026-11-12T22:30:00Z"
+    ],
+    "ts_expiration": "2026-11-30T18:30:00Z"
+  },
+  "BZG7": {
+    "ts_rolls": [
+      "2026-12-07T22:30:00Z",
+      "2026-12-08T22:30:00Z",
+      "2026-12-09T22:30:00Z",
+      "2026-12-10T22:30:00Z",
+      "2026-12-11T22:30:00Z"
+    ],
+    "ts_expiration": "2026-12-30T18:30:00Z"
+  }
+}
+```
+
+### Henry Hub Natural Gas (NATGAS / NG)
+
+NATGAS rolls monthly. `ts_expiration` follows the NYMEX Henry Hub last trading day rule.
+
+```json
+{
+  "NGG6": {
+    "ts_rolls": [
+      "2026-01-08T22:30:00Z",
+      "2026-01-09T22:30:00Z",
+      "2026-01-12T22:30:00Z",
+      "2026-01-13T22:30:00Z",
+      "2026-01-14T22:30:00Z"
+    ],
+    "ts_expiration": "2026-01-28T19:30:00Z"
+  },
+  "NGH6": {
+    "ts_rolls": [
+      "2026-02-06T22:30:00Z",
+      "2026-02-09T22:30:00Z",
+      "2026-02-10T22:30:00Z",
+      "2026-02-11T22:30:00Z",
+      "2026-02-12T22:30:00Z"
+    ],
+    "ts_expiration": "2026-02-25T19:30:00Z"
+  },
+  "NGJ6": {
+    "ts_rolls": [
+      "2026-03-06T22:30:00Z",
+      "2026-03-09T21:30:00Z",
+      "2026-03-10T21:30:00Z",
+      "2026-03-11T21:30:00Z",
+      "2026-03-12T21:30:00Z"
+    ],
+    "ts_expiration": "2026-03-27T18:30:00Z"
+  },
+  "NGK6": {
+    "ts_rolls": [
+      "2026-04-08T21:30:00Z",
+      "2026-04-09T21:30:00Z",
+      "2026-04-10T21:30:00Z",
+      "2026-04-13T21:30:00Z",
+      "2026-04-14T21:30:00Z"
+    ],
+    "ts_expiration": "2026-04-28T18:30:00Z"
+  },
+  "NGM6": {
+    "ts_rolls": [
+      "2026-05-07T21:30:00Z",
+      "2026-05-08T21:30:00Z",
+      "2026-05-11T21:30:00Z",
+      "2026-05-12T21:30:00Z",
+      "2026-05-13T21:30:00Z"
+    ],
+    "ts_expiration": "2026-05-27T18:30:00Z"
+  },
+  "NGN6": {
+    "ts_rolls": [
+      "2026-06-05T21:30:00Z",
+      "2026-06-08T21:30:00Z",
+      "2026-06-09T21:30:00Z",
+      "2026-06-10T21:30:00Z",
+      "2026-06-11T21:30:00Z"
+    ],
+    "ts_expiration": "2026-06-26T18:30:00Z"
+  },
+  "NGQ6": {
+    "ts_rolls": [
+      "2026-07-08T21:30:00Z",
+      "2026-07-09T21:30:00Z",
+      "2026-07-10T21:30:00Z",
+      "2026-07-13T21:30:00Z",
+      "2026-07-14T21:30:00Z"
+    ],
+    "ts_expiration": "2026-07-29T18:30:00Z"
+  },
+  "NGU6": {
+    "ts_rolls": [
+      "2026-08-07T21:30:00Z",
+      "2026-08-10T21:30:00Z",
+      "2026-08-11T21:30:00Z",
+      "2026-08-12T21:30:00Z",
+      "2026-08-13T21:30:00Z"
+    ],
+    "ts_expiration": "2026-08-27T18:30:00Z"
+  },
+  "NGV6": {
+    "ts_rolls": [
+      "2026-09-08T21:30:00Z",
+      "2026-09-09T21:30:00Z",
+      "2026-09-10T21:30:00Z",
+      "2026-09-11T21:30:00Z",
+      "2026-09-14T21:30:00Z"
+    ],
+    "ts_expiration": "2026-09-28T18:30:00Z"
+  },
+  "NGX6": {
+    "ts_rolls": [
+      "2026-10-07T21:30:00Z",
+      "2026-10-08T21:30:00Z",
+      "2026-10-09T21:30:00Z",
+      "2026-10-12T21:30:00Z",
+      "2026-10-13T21:30:00Z"
+    ],
+    "ts_expiration": "2026-10-28T18:30:00Z"
+  },
+  "NGZ6": {
+    "ts_rolls": [
+      "2026-11-06T22:30:00Z",
+      "2026-11-09T22:30:00Z",
+      "2026-11-10T22:30:00Z",
+      "2026-11-11T22:30:00Z",
+      "2026-11-12T22:30:00Z"
+    ],
+    "ts_expiration": "2026-11-25T19:30:00Z"
+  },
+  "NGF7": {
+    "ts_rolls": [
+      "2026-12-07T22:30:00Z",
+      "2026-12-08T22:30:00Z",
+      "2026-12-09T22:30:00Z",
+      "2026-12-10T22:30:00Z",
+      "2026-12-11T22:30:00Z"
+    ],
+    "ts_expiration": "2026-12-29T19:30:00Z"
+  }
+}
+```
+
+### Copper (COPPER / HG)
+
+Copper trades the five active months only: **H / K / N / U / Z**. `ts_expiration` is the third-last business day of the contract month at **12:00 CT (17:00 UTC / 18:00 UTC during CST)**.
+
+```json
+{
+  "HGH6": {
+    "ts_rolls": [
+      "2026-02-06T22:30:00Z",
+      "2026-02-09T22:30:00Z",
+      "2026-02-10T22:30:00Z",
+      "2026-02-11T22:30:00Z",
+      "2026-02-12T22:30:00Z"
+    ],
+    "ts_expiration": "2026-03-27T17:00:00Z"
+  },
+  "HGK6": {
+    "ts_rolls": [
+      "2026-04-08T21:30:00Z",
+      "2026-04-09T21:30:00Z",
+      "2026-04-10T21:30:00Z",
+      "2026-04-13T21:30:00Z",
+      "2026-04-14T21:30:00Z"
+    ],
+    "ts_expiration": "2026-05-27T17:00:00Z"
+  },
+  "HGN6": {
+    "ts_rolls": [
+      "2026-06-05T21:30:00Z",
+      "2026-06-08T21:30:00Z",
+      "2026-06-09T21:30:00Z",
+      "2026-06-10T21:30:00Z",
+      "2026-06-11T21:30:00Z"
+    ],
+    "ts_expiration": "2026-07-29T17:00:00Z"
+  },
+  "HGU6": {
+    "ts_rolls": [
+      "2026-08-07T21:30:00Z",
+      "2026-08-10T21:30:00Z",
+      "2026-08-11T21:30:00Z",
+      "2026-08-12T21:30:00Z",
+      "2026-08-13T21:30:00Z"
+    ],
+    "ts_expiration": "2026-09-28T17:00:00Z"
+  },
+  "HGZ6": {
+    "ts_rolls": [
+      "2026-11-06T22:30:00Z",
+      "2026-11-09T22:30:00Z",
+      "2026-11-10T22:30:00Z",
+      "2026-11-11T22:30:00Z",
+      "2026-11-12T22:30:00Z"
+    ],
+    "ts_expiration": "2026-12-29T18:00:00Z"
+  }
+}
+```

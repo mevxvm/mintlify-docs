@@ -1,0 +1,111 @@
+---
+title: "Understanding Liquidations and How to Avoid Them"
+description: "Learn what triggers a liquidation on Trade[XYZ], how the mark price protects you from unfair closes, and the steps you can take to protect your position."
+---
+
+Liquidation is the automatic closure of your position when your margin falls below the level required to keep it open. The platform closes your position to prevent your account balance from going negative — it protects both you and the integrity of the system. Understanding what triggers a liquidation, and how Trade[XYZ] makes the process safer, helps you trade with less risk of an unexpected close.
+
+## What is the liquidation price?
+
+Your liquidation price is the price at which your remaining margin equals the maintenance margin requirement. If the mark price reaches that level, your position is closed.
+
+The liquidation price depends on three things:
+
+- **Entry price** — the price at which you opened the position
+- **Leverage** — higher leverage means the liquidation price is closer to your entry
+- **Maintenance margin rate** — the minimum collateral fraction required to keep the position open
+
+<Note>
+  The liquidation price moves closer to the current market price as leverage increases. A 20× position has very little room to move before being liquidated.
+</Note>
+
+### Worked example
+
+| | Long example | Short example |
+|---|---|---|
+| Entry price | \$100 | \$100 |
+| Leverage | 10× | 10× |
+| Initial margin | \$10 (10%) | \$10 (10%) |
+| Maintenance margin | \$5 (5%) | \$5 (5%) |
+| Approximate liquidation price | ~\$95 | ~\$105 |
+
+<Info>
+  The exact liquidation price is displayed on your position panel before and after you open a trade. Check it before committing to a position size.
+</Info>
+
+## What triggers a liquidation?
+
+Liquidation is triggered by the **mark price**, not by the last traded price or the oracle price.
+
+<Warning>
+  The mark price is the only price that matters for liquidation. A spike in the last traded price or a sudden move in an oracle feed will not liquidate your position on its own.
+</Warning>
+
+### Why the mark price?
+
+Spot prices and last-traded prices can spike momentarily due to thin order books, manipulation, or oracle latency. If liquidations were triggered by these prices, a single large trade or a brief data anomaly could wipe out positions that are fundamentally healthy.
+
+The mark price is derived from smoothed, manipulation-resistant inputs (mark1 and mark2), which use exponential moving averages of aggregated price data. This makes it far harder to trigger a liquidation artificially.
+
+## Price clamping and liquidation safety
+
+Trade[XYZ] applies **price clamping** to mark price updates — limiting how much the mark price can move in a single tick (maximum 0.5% per update).
+
+This has an important consequence: even if the underlying market moves quickly, the mark price adjusts gradually. Liquidations happen incrementally rather than all at once in response to a sharp move.
+
+<Tip>
+  Price clamping gives you time to respond to a fast-moving market. Even if a price gaps sharply, you may have a window to add margin, reduce your position, or close before the mark price reaches your liquidation level.
+</Tip>
+
+## The liquidation process
+
+<Steps>
+  <Step title="Continuous monitoring">
+    The system continuously compares the mark price against your maintenance margin level. This check runs in real time for every open position.
+  </Step>
+  <Step title="Threshold breach detected">
+    If the mark price reaches your liquidation price, the system flags your position for liquidation.
+  </Step>
+  <Step title="Partial liquidation attempted first">
+    Where possible, the system attempts a partial liquidation — reducing your position size enough to restore your margin to the maintenance level, rather than closing the entire position immediately.
+  </Step>
+  <Step title="Full liquidation if necessary">
+    If partial liquidation is insufficient to restore margin, the full position is closed at the best available market price.
+  </Step>
+</Steps>
+
+## How to avoid liquidation
+
+<AccordionGroup>
+  <Accordion title="Use less leverage" icon="sliders" defaultOpen={true}>
+    This is the most effective protection. Lower leverage pushes your liquidation price further from your entry, giving the position more room to breathe. A 2× position has a liquidation price roughly 50% away from entry; a 20× position has roughly 5%.
+  </Accordion>
+  <Accordion title="Add margin to your position" icon="plus">
+    If your position is approaching its liquidation price, you can inject additional margin to push the liquidation price further away. This is available on both cross-margin and isolated-margin positions.
+
+    In isolated-margin mode, adding margin to one position has no effect on any other position.
+  </Accordion>
+  <Accordion title="Reduce your position size" icon="minimize">
+    Reducing position size lowers the notional exposure and increases your effective margin ratio. This directly raises the distance between your current equity and the liquidation threshold.
+  </Accordion>
+  <Accordion title="Use isolated-margin to cap maximum loss" icon="lock">
+    Opening a position in isolated-margin mode means the maximum you can lose is the margin allocated to that position. Even if the position is liquidated, the rest of your account is untouched.
+
+    See [Margin modes](/trading/margin) for a full comparison of cross-margin and isolated-margin.
+  </Accordion>
+  <Accordion title="Monitor your positions actively" icon="eye">
+    Keep an eye on your margin ratio, especially during volatile periods. Because price clamping limits how fast the mark price moves, you typically have some time to act — but fast markets require prompt responses.
+  </Accordion>
+</AccordionGroup>
+
+## Partial vs full liquidation
+
+| Scenario | Outcome |
+|---|---|
+| Reducing position size restores margin above maintenance | Partial liquidation — only part of the position is closed |
+| Partial reduction is insufficient | Full liquidation — entire position is closed |
+| Cross-margin account equity falls below total maintenance requirement | All positions in the account may be liquidated |
+
+<Warning>
+  In cross-margin mode, a single liquidation event can affect all of your open positions if it depletes the shared collateral pool below the combined maintenance margin of your portfolio.
+</Warning>

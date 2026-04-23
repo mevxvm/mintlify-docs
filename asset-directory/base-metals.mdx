@@ -1,0 +1,122 @@
+---
+title: 'Base Metal Perpetuals on Trade[XYZ]: Copper and Aluminium'
+description: 'Copper and aluminium perpetuals on Trade[XYZ] — COMEX contract specs, active months, roll schedules, and global benchmark context for industrial metals.'
+---
+
+Trade[XYZ] lists two base metal perpetuals: Copper and Aluminium. Unlike precious metals, base metals use futures-based oracles and follow the same 5-step roll schedule used by energy contracts — rolling over business days 5–9 of the roll month at 17:30 ET. Both contracts trade on COMEX (CME Group) and serve as direct exposure to industrial demand conditions globally.
+
+## Contracts at a glance
+
+| Symbol | Display | Exchange | Contract code | Active months | Unit |
+|--------|---------|----------|---------------|---------------|------|
+| **COPPER** | COPPER | COMEX (CME Group) | HG | H, K, N, U, Z (5 months) | Per pound |
+| **ALUMINIUM** | ALUMINIUM | COMEX | ALI | All 12 | Per metric ton |
+
+<Tip>
+  The coin identifier for each contract is `xyz:SYMBOL` — for example, `xyz:COPPER` for copper and `xyz:ALUMINIUM` for aluminium.
+</Tip>
+
+---
+
+## Copper (COPPER)
+
+Copper is one of the most economically significant industrial metals and is widely regarded as a barometer of global manufacturing and infrastructure activity. Its price often moves in tandem with GDP growth expectations, construction activity, and manufacturing output — earning it the informal title "Dr. Copper" for its perceived ability to signal economic turning points.
+
+Copper futures on COMEX (contract code HG) trade on five active months per year: March (H), May (K), July (N), September (U), and December (Z).
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Coin** | `xyz:COPPER` |
+| **Display name** | COPPER |
+| **Keywords** | `HG`, `metal` |
+| **Underlying** | 1 pound of copper |
+| **Exchange** | COMEX (CME Group) |
+| **Contract code** | HG |
+| **Active months** | H (Mar), K (May), N (Jul), U (Sep), Z (Dec) |
+| **Price quotation** | USD per pound |
+
+### Roll schedule
+
+Copper rolls use a 5-step linear transition over business days 5–9 of the roll month. The `ts_expiration` is the third-last business day of the contract month at 12:00 CT (17:00 UTC). All timestamps below are UTC.
+
+```json
+{
+  "HGH6": {
+    "ts_rolls": [
+      "2026-02-06T22:30:00Z",
+      "2026-02-09T22:30:00Z",
+      "2026-02-10T22:30:00Z",
+      "2026-02-11T22:30:00Z",
+      "2026-02-12T22:30:00Z"
+    ],
+    "ts_expiration": "2026-03-27T17:00:00Z"
+  },
+  "HGK6": {
+    "ts_rolls": [
+      "2026-04-08T21:30:00Z",
+      "2026-04-09T21:30:00Z",
+      "2026-04-10T21:30:00Z",
+      "2026-04-13T21:30:00Z",
+      "2026-04-14T21:30:00Z"
+    ],
+    "ts_expiration": "2026-05-27T17:00:00Z"
+  }
+}
+```
+
+<Note>
+  Copper has only five active contract months (H/K/N/U/Z), so the roll schedule does not include every calendar month. Refer to the [Roll Calendar](/asset-directory/roll-calendar) for the full 2026 schedule covering HGH6 through HGZ6.
+</Note>
+
+### Active contract calendar
+
+| Month | Jan | Feb | Mar | Apr | May | Jun | Jul | Aug | Sep | Oct | Nov | Dec |
+|-------|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
+| **HG** | H | H | K | K | N | N | U | U | Z | Z | Z | H+1 |
+
+---
+
+## Aluminium (ALUMINIUM)
+
+Aluminium is the most widely used non-ferrous metal globally, valued for its combination of light weight, corrosion resistance, and conductivity. Key demand sectors include transportation (automotive and aerospace), construction, packaging, and power infrastructure (overhead transmission lines). All 12 calendar months are active for aluminium futures on COMEX (contract code ALI).
+
+The global reference benchmark for aluminium is set by the **London Metal Exchange (LME)**, which operates the world's largest and oldest base metals exchange. COMEX aluminium futures are priced in USD per metric ton.
+
+### Contract specification
+
+| Field | Value |
+|-------|-------|
+| **Coin** | `xyz:ALUMINIUM` |
+| **Display name** | ALUMINIUM |
+| **Keywords** | `ALI`, `metal` |
+| **Underlying** | 1 metric ton of aluminum |
+| **Exchange** | COMEX |
+| **Contract code** | ALI |
+| **Active months** | All 12 |
+
+---
+
+## Roll mechanics
+
+Both copper and aluminium follow the same roll structure used by energy contracts on Trade[XYZ].
+
+<AccordionGroup>
+  <Accordion title="Roll timing">
+    Rolls execute at **17:30 ET** on business days 5, 6, 7, 8, and 9 of the roll month. Each step shifts 20% of exposure from the expiring contract to the incoming contract. By business day 10, the position is 100% in the new contract.
+  </Accordion>
+  <Accordion title="Copper expiration rule">
+    Copper `ts_expiration` = the third-last business day of the contract month at **12:00 CT**. For example, `HGH6` expires on `2026-03-27T17:00:00Z` (12:00 CT = 17:00 UTC during CDT).
+  </Accordion>
+  <Accordion title="Timestamp conventions">
+    All `ts_rolls` and `ts_expiration` values in the roll calendar are expressed in UTC. Winter rolls appear at `22:30Z` (= 17:30 ET) and summer rolls at `21:30Z` (= 17:30 ET) due to US daylight saving time.
+  </Accordion>
+  <Accordion title="Index methodology alignment">
+    This roll schedule aligns with the S&P GSCI and Bloomberg Commodity Index (BCOM) methodology, which transitions commodity exposure over business days 5–9 of the roll month.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  For the complete roll schedule across all commodity contracts, see the [Roll Calendar](/asset-directory/roll-calendar).
+</Tip>

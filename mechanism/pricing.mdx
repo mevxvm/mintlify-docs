@@ -1,0 +1,136 @@
+---
+title: "Oracle, Mark, and External Prices on Trade[XYZ]"
+description: "Learn how Trade[XYZ] calculates oracle, mark, and external prices for every asset — and why each one matters for your positions and liquidation risk."
+---
+
+Every asset on Trade[XYZ] carries three distinct prices at all times: an **oracle price**, a **mark price**, and an **external price**. Understanding what each one represents — and how it's calculated — helps you interpret your P&L, anticipate liquidation thresholds, and recognize when market conditions are unusual. The system is designed to protect you from bad liquidations while still enabling the platform to act decisively when a position is genuinely under water.
+
+## The three price types
+
+<AccordionGroup>
+  <Accordion title="Oracle price — the fair value reference">
+    The oracle price represents Trade[XYZ]'s best estimate of what the underlying asset is actually worth right now. It is derived from one or more external price providers (PPX), a secondary reference oracle for cross-validation, and an exponential moving average of the platform's own order book mid-price.
+
+    The oracle price serves as the anchor for the entire pricing system. When providers agree, it closely tracks the live market. When they disagree or go missing, the system falls back to more conservative inputs to prevent a single manipulated feed from distorting your position value.
+  </Accordion>
+
+  <Accordion title="Mark price — what your P&L and liquidations use">
+    The mark price is the number the platform uses to calculate your unrealized P&L and to determine whether your position should be liquidated. It comes in two variants:
+
+    - **mark1** — stays close to the oracle price. It is the primary signal used to trigger liquidations.
+    - **mark2** — incorporates an exponential moving average of the order book, making it slower to react to sudden moves. It acts as a second check to prevent premature liquidations caused by brief price spikes.
+
+    <Note>
+      Your liquidation is evaluated against both mark variants. Using two signals reduces the risk that a temporary price dislocation forces you out of an otherwise healthy position.
+    </Note>
+  </Accordion>
+
+  <Accordion title="External price — protection against P&L manipulation">
+    The external price limits how much your unrealized P&L can be inflated by order book activity you or others control. It is based on an exponential moving average of the platform's own order book mid-price (EMA of BBOT), which makes it resistant to short-lived price spikes or thin-book manipulation.
+
+    When the oracle and external prices diverge, it signals that the on-chain book is temporarily disconnected from the broader market.
+  </Accordion>
+</AccordionGroup>
+
+## How prices are calculated
+
+The calculation method depends on how many external price providers are active and whether they agree with one another.
+
+<Tabs>
+  <Tab title="1 provider">
+    When only one external provider is available, the oracle is computed conservatively using the median of all three available inputs. Mark and external rely more heavily on the order book EMA.
+
+    | Price type | Formula |
+    |------------|---------|
+    | Oracle | `median(PPX, externalOracle, EMA_150S(BBOT))` |
+    | mark1 | `PPX` |
+    | mark2 | `EMA_150S(BBOT)` |
+    | External | `EMA_150S(BBOT)` |
+
+    <Warning>
+      A single provider means less cross-validation. The platform accepts the provider's price directly for mark1, but uses the order book EMA as a second opinion for mark2 and external.
+    </Warning>
+  </Tab>
+
+  <Tab title="2 providers — agreeing">
+    When two providers are active and their prices are close enough to each other, they are considered to agree. The oracle is a clean median across both providers and the secondary reference oracle.
+
+    | Price type | Formula |
+    |------------|---------|
+    | Oracle | `median(PPX1, PPX2, externalOracle)` |
+    | mark1 | `oracle` |
+    | mark2 | `oracle + EMA_150S(basis)` |
+    | External | `oracle` |
+
+    This is the standard operating mode for most assets most of the time. Mark2 incorporates a small basis adjustment from the order book EMA on top of the oracle.
+  </Tab>
+
+  <Tab title="2 providers — disagreeing">
+    When two providers diverge significantly, the system cannot trust either one as the authoritative price. The oracle falls back to the order book EMA. Mark1 still uses the median of both providers (plus the secondary reference oracle), but mark2 and external defer to the safer EMA-based figure.
+
+    | Price type | Formula |
+    |------------|---------|
+    | Oracle | `EMA_150S(BBOT)` (fallback) |
+    | mark1 | `median(PPX1, PPX2, externalOracle)` |
+    | mark2 | `EMA_150S(BBOT)` |
+    | External | `EMA_150S(BBOT)` |
+
+    <Warning>
+      Provider disagreement is a signal of uncertain market conditions. Your mark price may diverge noticeably from the figure you see on external exchanges.
+    </Warning>
+  </Tab>
+
+  <Tab title="3+ providers — all agreeing">
+    With three or more providers all in agreement, the system uses the same logic as two agreeing providers. The median across all provider prices replaces the two-provider formula.
+
+    | Price type | Formula |
+    |------------|---------|
+    | Oracle | `median(PPX1, PPX2, …)` |
+    | mark1 | `oracle` |
+    | mark2 | `oracle + EMA_150S(basis)` |
+    | External | `oracle` |
+
+    More providers in agreement increases confidence in the oracle price.
+  </Tab>
+
+  <Tab title="3+ providers — any disagreeing">
+    If at least one provider deviates significantly from the median of all providers, the oracle still uses the median of all PPX inputs — but mark2 and external switch to the order book EMA for added safety.
+
+    | Price type | Formula |
+    |------------|---------|
+    | Oracle | `median(PPX1, PPX2, …)` |
+    | mark1 | `median(PPX1, PPX2, …)` |
+    | mark2 | `EMA_150S(BBOT)` |
+    | External | `EMA_150S(BBOT)` |
+  </Tab>
+</Tabs>
+
+## Glossary of terms
+
+| Term | Meaning |
+|------|---------|
+| PPX | Price from an external provider feed |
+| External oracle | A secondary reference oracle used to cross-validate provider prices |
+| BBOT | Best bid / best offer on the Trade[XYZ] order book |
+| EMA_150S | Exponential moving average over a 150-second window |
+| basis | Spread between provider prices and the order book mid |
+
+## A real example
+
+Here is a snapshot from a live broadcast showing all three assets during an active session. Notice that mark2 is significantly lower than mark1 and oracle — this reflects the order book EMA pulling the slower mark variant away from the external reference price.
+
+```json
+{"asset": "XYZ100",  "oraclePx": "25954", "externalPerpPx": "26000", "mark1Px": "25824", "mark2Px": "25231"}
+{"asset": "TSLA",    "oraclePx": "453.99", "externalPerpPx": "430.4",  "mark1Px": "451.72", "mark2Px": "415.56"}
+{"asset": "NVDA",    "oraclePx": "204.65", "externalPerpPx": "203.74", "mark1Px": "203.63", "mark2Px": "184.08"}
+```
+
+<Tip>
+  If you see a wide gap between mark1 and mark2, the order book mid has moved significantly away from the external reference. This is normal during fast markets. Your liquidation threshold is evaluated against both — you are protected from mark2 spikes, but mark1 still reflects the broader market price.
+</Tip>
+
+## Price clamping
+
+Each price type can only move by a configured maximum amount per update tick (typically **0.5%** — `maxMove = 0.005`). If the raw calculated price would exceed this band relative to the previous published price, the platform clamps it to the boundary value instead.
+
+Clamping protects you from sudden oracle dislocations that could trigger unfair liquidations. For a full explanation of how clamping works and what you see when it's active, see [Price Bands and Clamping](/mechanism/price-bands).
